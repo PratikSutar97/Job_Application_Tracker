@@ -2,976 +2,595 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Job Search Ledger</title>
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<meta name="theme-color" content="#2A2620">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Job Ledger">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Job Application Tracker</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+:root{--paper:#f3eee1;--card:#fffdf8;--ink:#2a2620;--muted:#6b6455;--line:#c2b694;--red:#7a2e1e;--green:#2e4324;--blue:#22374d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif;padding:28px 20px 60px}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.wrap{max-width:1180px;margin:auto}.auth-locked{overflow:hidden}
+.auth-gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}.auth-card{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px;box-shadow:0 12px 30px #0001}.auth-card h1{font:600 24px monospace;margin:0 0 6px}.auth-card p{font-size:13px;color:var(--muted);line-height:1.5}.auth-card label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 6px}.auth-card input{width:100%;padding:11px;border:1px solid var(--line);border-radius:4px;background:#fff}.pin{letter-spacing:6px;font:600 20px monospace;text-align:center}.auth-primary,.primary{background:var(--ink);color:var(--paper);border:0;border-radius:4px;padding:11px 16px;font-weight:600}.auth-primary{width:100%;margin-top:16px}.secondary,.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:9px 13px}.auth-link{background:none;border:0;color:var(--blue);text-decoration:underline;font-size:12px;width:100%;padding:10px}.auth-msg{min-height:20px;font-size:12px;line-height:1.4;margin-top:8px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:18px}.brand h1{font:600 26px monospace;margin:0 0 4px}.subtitle{font-size:13px;color:var(--muted);margin:0}.userbox{display:flex;align-items:center;gap:8px}.useremail{font-size:11px;color:var(--muted)}.stats{display:flex;gap:20px}.stat{text-align:right}.stat b{display:block;font:600 22px monospace}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}.tab{border:0;background:none;padding:9px 14px;font:600 12px monospace;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--ink);border-bottom-color:var(--ink)}.toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px}.toolbar-left,.toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.search,select{padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink)}.search{min-width:210px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}@media(max-width:900px){.board{grid-template-columns:1fr 1fr}}@media(max-width:600px){.board{grid-template-columns:1fr}.stats{width:100%;justify-content:space-between}}
+.col{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fff5}.colhead{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:4px 4px 9px;margin-bottom:9px;font:600 12px monospace;text-transform:uppercase}.cards{min-height:100px}.card{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:12px;margin-bottom:9px}.card:hover{border-color:var(--ink)}.card{cursor:grab}.card.dragging{opacity:.45}.col.drag-over{outline:2px dashed var(--ink);outline-offset:-3px}.cardtop{display:flex;justify-content:space-between;gap:8px}.company{font-weight:600;font-size:14px}.role{font-size:12.5px;color:var(--muted);margin:3px 0 9px}.meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}.badge{font:600 9px monospace;text-transform:uppercase;padding:3px 6px;border-radius:3px}.applied{background:#e7e2d3}.interviewing{background:#dce6ee;color:var(--blue)}.offer{background:#e1ead9;color:var(--green)}.rejected{background:#f1dad3;color:var(--red)}.empty{text-align:center;color:var(--muted);padding:55px 20px}.empty h2{font:600 17px monospace;color:var(--ink)}
+.modalback{position:fixed;inset:0;background:#1e1a1470;z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}.modal{background:var(--paper);width:min(600px,100%);border:1px solid var(--ink);border-radius:6px;padding:24px}.modal h2{font:600 18px monospace;margin:0 0 18px}.field{margin-bottom:13px}.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:#fff}.field textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.row{grid-template-columns:1fr}}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px}.danger{background:transparent;border:1px solid var(--red);color:var(--red);border-radius:4px;padding:9px 13px}.notice{font-size:11px;color:var(--muted);min-height:16px;text-align:center;margin-top:6px}
+.listview{display:flex;flex-direction:column;gap:10px}.listrow{background:var(--card);border:1px solid var(--line);padding:13px;border-radius:5px;display:grid;grid-template-columns:1fr auto;gap:10px}.listrow h3{margin:0;font-size:14px}.listrow p{margin:4px 0;color:var(--muted);font-size:12px}.listactions{display:flex;gap:6px;align-items:start}.metricgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.metric{background:var(--card);border:1px solid var(--line);padding:15px;border-radius:5px}.metric b{font:600 26px monospace;display:block}.metric span{font-size:11px;color:var(--muted)}
 
-  :root{
-    --paper:#F3EEE1;
-    --card:#FFFDF8;
-    --ink:#2A2620;
-    --ink-soft:#6B6455;
-    --line:#D8CFB8;
-    --line-strong:#C2B694;
-    --rust:#B3452F;
-    --rust-ink:#7A2E1E;
-    --rust-bg:#F1DAD3;
-    --slate:#3C5470;
-    --slate-ink:#22374D;
-    --slate-bg:#DCE6EE;
-    --moss:#4C6B3C;
-    --moss-ink:#2E4324;
-    --moss-bg:#E1EAD9;
-    --amber-ink:#7A5A0E;
-    --amber-bg:#F3E4BE;
-    --gray:#8A8378;
-    --gray-ink:#4A453B;
+
+
+.followup-alert{margin-top:7px;padding:5px 7px;border-left:3px solid var(--ink);font:10px monospace;background:var(--card)}
+.followup-alert strong{font-weight:700}
+
+.research-links{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.research-links a{display:inline-block;border:1px solid var(--line);border-radius:3px;padding:4px 7px;text-decoration:none;font:10px monospace;color:var(--ink);background:var(--card)}
+.research-links a:hover{text-decoration:underline}
+.weekly-chart{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:5px;padding:16px}
+.weekly-chart h3{font:600 14px monospace;margin:0 0 4px}
+.weekly-chart .chart-subtitle{font-size:11px;color:var(--muted);margin-bottom:18px}
+.week-bars{display:grid;grid-template-columns:repeat(8,minmax(45px,1fr));gap:10px;align-items:end;min-height:190px}
+.week-bar-wrap{height:190px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px}
+.week-count{font:600 11px monospace;min-height:14px}
+.week-bar-track{height:145px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.week-bar{width:min(34px,70%);min-height:2px;background:var(--ink);border-radius:3px 3px 0 0}
+.week-label{font:10px monospace;color:var(--muted);text-align:center;white-space:nowrap}
+.weekly-empty{color:var(--muted);font-size:12px;padding:28px 4px;text-align:center}
+@media(max-width:600px){.week-bars{gap:5px}.week-label{font-size:9px}.week-bar{width:22px}}
+/* =========================
+   CALENDAR
+   ========================= */
+
+.calendar-wrap{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:6px;
+  overflow:hidden;
+}
+
+.calendar-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+}
+
+.calendar-title{
+  font:600 18px monospace;
+  margin:0;
+}
+
+.calendar-nav{
+  display:flex;
+  gap:6px;
+}
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
+
+.calendar-weekday{
+  padding:10px 6px;
+  text-align:center;
+  font:600 10px monospace;
+  text-transform:uppercase;
+  color:var(--muted);
+  border-bottom:1px solid var(--line);
+  background:#faf7ef;
+}
+
+.calendar-day{
+  min-height:125px;
+  padding:7px;
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--card);
+}
+
+.calendar-day:nth-child(7n){
+  border-right:0;
+}
+
+.calendar-day.other-month{
+  background:#f6f1e6;
+  color:#aaa;
+}
+
+.calendar-day.today{
+  box-shadow:inset 0 0 0 2px var(--ink);
+}
+
+.calendar-date{
+  font:600 11px monospace;
+  margin-bottom:6px;
+}
+
+.calendar-apps{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.calendar-app{
+  display:block;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:5px 6px;
+  text-align:left;
+  background:#fff;
+  cursor:pointer;
+  overflow:hidden;
+}
+
+.calendar-app:hover{
+  border-color:var(--ink);
+}
+
+.calendar-app-company{
+  display:block;
+  font-size:10px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.calendar-app-role{
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:2px;
+}
+
+.calendar-app.applied{
+  border-left:4px solid #aaa18c;
+}
+
+.calendar-app.interviewing{
+  border-left:4px solid var(--blue);
+}
+
+.calendar-app.offer{
+  border-left:4px solid var(--green);
+}
+
+.calendar-app.rejected{
+  border-left:4px solid var(--red);
+}
+
+.calendar-more{
+  font:9px monospace;
+  color:var(--muted);
+  padding:2px 4px;
+}
+
+@media(max-width:700px){
+  .calendar-day{
+    min-height:90px;
+    padding:4px;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Inter',sans-serif;
-    background:var(--paper);
-    color:var(--ink);
-    padding:28px 20px 60px;
+
+  .calendar-app-role{
+    display:none;
   }
-  .wrap{max-width:1180px;margin:0 auto;}
 
-  header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    flex-wrap:wrap;
-    gap:16px;
-    margin-bottom:20px;
-    padding-bottom:18px;
-    border-bottom:2px solid var(--ink);
+  .calendar-app{
+    padding:4px;
   }
-  h1{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:26px;
-    font-weight:600;
-    margin:0 0 4px;
-    letter-spacing:-0.3px;
+
+  .calendar-weekday{
+    font-size:8px;
   }
-  .subtitle{color:var(--ink-soft);font-size:13px;margin:0;}
-  .stats{display:flex;gap:22px;}
-  .stat{text-align:right;}
-  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;display:block;line-height:1;}
-  .stat .lab{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.5px;}
-  .stat.flag .num{color:var(--rust-ink);}
+}
 
-  /* Tabs */
-  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--line-strong);}
-  .tab-btn{
-    background:none;border:none;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;
-    color:var(--ink-soft);
-    padding:9px 14px;
-    border-bottom:2px solid transparent;
-    margin-bottom:-1px;
-    cursor:pointer;
+@media(max-width:500px){
+  .calendar-day{
+    min-height:70px;
   }
-  .tab-btn:hover{color:var(--ink);}
-  .tab-btn.active{color:var(--ink);border-bottom-color:var(--ink);}
 
-  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px;flex-wrap:wrap;}
-  .toolbar-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:1;}
-  button{font-family:'Inter',sans-serif;cursor:pointer;border-radius:3px;}
-  .btn-primary{background:var(--ink);color:var(--paper);border:none;padding:10px 18px;font-size:13px;font-weight:600;letter-spacing:0.3px;}
-  .btn-primary:hover{background:#000;}
-  .btn-ghost{background:transparent;border:1px solid var(--line-strong);padding:9px 14px;font-size:12.5px;color:var(--ink);}
-  .btn-ghost:hover{border-color:var(--ink);}
-  .btn-ghost.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-  .btn-danger{background:transparent;border:1px solid var(--rust);color:var(--rust-ink);padding:9px 14px;font-size:12.5px;}
-  .btn-danger:hover{background:var(--rust-bg);}
-  .link-btn{background:none;border:none;color:var(--ink-soft);font-size:12px;text-decoration:underline;padding:2px;cursor:pointer;}
-  .link-btn:hover{color:var(--rust-ink);}
-
-  .search{padding:9px 12px;border:1px solid var(--line-strong);background:var(--card);font-size:13px;border-radius:3px;font-family:'Inter',sans-serif;color:var(--ink);min-width:170px;}
-  select.sel{padding:9px 10px;border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;border-radius:3px;font-family:'Inter',sans-serif;color:var(--ink);}
-
-  .board{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-  .board.with-archive{grid-template-columns:repeat(5,1fr);}
-  @media (max-width:1000px){.board{grid-template-columns:1fr 1fr;}}
-  @media (max-width:560px){.board{grid-template-columns:1fr;}}
-
-  .col{background:rgba(255,255,255,0.35);border:1px solid var(--line);border-radius:6px;padding:10px;min-height:120px;transition:border-color .12s,background .12s;}
-  .col-head{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 10px;margin-bottom:8px;border-bottom:1px solid var(--line-strong);}
-  .col-title{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;}
-  .col-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);}
-  .col-body{min-height:80px;}
-  .col.drag-over{border-color:var(--ink);background:rgba(255,255,255,0.6);}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:12px 12px 10px;margin-bottom:10px;cursor:grab;position:relative;transition:border-color .12s,transform .12s,opacity .12s;}
-  .card:hover{border-color:var(--ink);transform:translateY(-1px);}
-  .card.dragging{opacity:0.4;}
-  .card:active{cursor:grabbing;}
-  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
-  .card .co{font-weight:600;font-size:14px;margin:0 0 2px;}
-  .card .role{font-size:12.5px;color:var(--ink-soft);margin:0 0 8px;}
-  .card .meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--gray-ink);flex-wrap:wrap;gap:4px;}
-  .card .date{font-family:'IBM Plex Mono',monospace;}
-  .edit-pencil{background:none;border:none;color:var(--ink-soft);font-size:12px;padding:2px 4px;cursor:pointer;line-height:1;opacity:0;transition:opacity .1s;}
-  .card:hover .edit-pencil{opacity:1;}
-  .edit-pencil:hover{color:var(--ink);}
-  .followup-flag{display:inline-block;font-size:10px;font-weight:600;color:var(--rust-ink);background:var(--rust-bg);padding:2px 6px;border-radius:2px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.3px;text-transform:uppercase;margin-top:6px;}
-  .card-edit-row{display:flex;gap:6px;margin-bottom:6px;}
-  .card-edit-row input{flex:1;font-size:12.5px;padding:5px 7px;border:1px solid var(--line-strong);border-radius:3px;font-family:'Inter',sans-serif;}
-  .card-edit-actions{display:flex;gap:6px;justify-content:flex-end;}
-  .card-edit-actions button{font-size:11px;padding:4px 9px;}
-
-  .badge{font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;padding:2px 6px;border-radius:2px;letter-spacing:0.4px;text-transform:uppercase;}
-  .b-applied{background:#E7E2D3;color:var(--gray-ink);}
-  .b-interviewing{background:var(--slate-bg);color:var(--slate-ink);}
-  .b-offer{background:var(--moss-bg);color:var(--moss-ink);}
-  .b-rejected{background:var(--rust-bg);color:var(--rust-ink);}
-  .b-archived{background:#E4E1D8;color:var(--gray-ink);}
-
-  .empty-col{font-size:12px;color:var(--ink-soft);text-align:center;padding:18px 4px;font-style:italic;}
-  .empty-state{text-align:center;padding:60px 20px;color:var(--ink-soft);}
-  .empty-state h3{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ink);margin-bottom:6px;}
-
-  /* Timeline */
-  .timeline{position:relative;padding-left:22px;}
-  .timeline::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:1px;background:var(--line-strong);}
-  .tl-item{position:relative;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:12px 14px;margin-bottom:12px;cursor:pointer;}
-  .tl-item:hover{border-color:var(--ink);}
-  .tl-item::before{content:"";position:absolute;left:-22px;top:16px;width:9px;height:9px;border-radius:50%;background:var(--ink);border:2px solid var(--paper);}
-  .tl-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:4px;}
-  .tl-title{font-weight:600;font-size:14px;}
-  .tl-role{font-size:12.5px;color:var(--ink-soft);}
-  .tl-meta{display:flex;gap:8px;align-items:center;margin-top:6px;}
-
-  /* Stats */
-  .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px;}
-  .metric-card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;}
-  .metric-card .m-num{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;display:block;line-height:1.1;}
-  .metric-card .m-lab{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
-  .section-h{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 12px;}
-  .funnel{margin-bottom:10px;}
-  .funnel-row{display:grid;grid-template-columns:120px 1fr 60px;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
-  .funnel-bar-track{background:#E7E2D3;border-radius:3px;height:22px;overflow:hidden;}
-  .funnel-bar-fill{background:var(--ink);height:100%;border-radius:3px;transition:width .3s;}
-  .funnel-count{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--ink-soft);}
-
-  /* Patterns */
-  .pattern-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  @media (max-width:700px){.pattern-cols{grid-template-columns:1fr;}}
-  .pattern-list{display:flex;flex-direction:column;gap:8px;}
-  .pattern-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:9px 12px;}
-  .pattern-bar-wrap{grid-column:1/-1;background:#E7E2D3;border-radius:2px;height:5px;margin-top:2px;overflow:hidden;}
-  .pattern-bar{height:100%;border-radius:2px;}
-  .pattern-bar.well{background:var(--moss);}
-  .pattern-bar.wrong{background:var(--rust);}
-  .pattern-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);}
-
-  /* Modal */
-  .overlay{display:none;position:fixed;inset:0;background:rgba(30,26,20,0.45);z-index:50;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px;}
-  .overlay.open{display:flex;}
-  .modal{background:var(--paper);border:1px solid var(--ink);border-radius:6px;width:100%;max-width:580px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.18);}
-  .modal h2{font-family:'IBM Plex Mono',monospace;font-size:18px;margin:0 0 16px;}
-  .field{margin-bottom:14px;}
-  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;}
-  .field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);border-radius:3px;font-family:'Inter',sans-serif;font-size:13.5px;background:#fff;color:var(--ink);}
-  .field textarea{resize:vertical;min-height:56px;font-family:'Inter',sans-serif;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .modal-actions{display:flex;justify-content:space-between;margin-top:18px;gap:8px;align-items:center;}
-
-  .detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;}
-  .detail-head h2{margin:0;}
-  .close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:2px 6px;}
-  .close-x:hover{color:var(--ink);}
-  .detail-meta{font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;}
-  .detail-meta a{color:var(--slate-ink);}
-
-  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-soft);margin:18px 0 8px;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
-  .add-log-btn{background:none;border:1px solid var(--line-strong);font-size:11px;padding:4px 8px;border-radius:3px;color:var(--ink);}
-  .add-log-btn:hover{border-color:var(--ink);}
-
-  .log-entry{border:1px solid var(--line);border-radius:4px;padding:10px 12px;margin-bottom:8px;background:#fff;}
-  .log-entry .log-top{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
-  .log-entry .log-body{font-size:12.5px;line-height:1.5;}
-  .log-entry .log-body b{color:var(--moss-ink);}
-  .log-entry .log-body .bad{color:var(--rust-ink);}
-  .log-entry .log-remove{background:none;border:none;color:var(--ink-soft);font-size:11px;cursor:pointer;padding:0;}
-  .log-entry .log-remove:hover{color:var(--rust-ink);}
-  .log-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-  .log-tag{font-size:10px;padding:2px 7px;border-radius:10px;font-family:'IBM Plex Mono',monospace;}
-  .log-tag.well{background:var(--moss-bg);color:var(--moss-ink);}
-  .log-tag.wrong{background:var(--rust-bg);color:var(--rust-ink);}
-  .stars{color:var(--amber-ink);font-size:13px;letter-spacing:1px;}
-
-  .new-log{border:1px dashed var(--line-strong);border-radius:4px;padding:10px 12px;margin-bottom:8px;}
-  .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-  .chip{font-size:11.5px;padding:5px 10px;border:1px solid var(--line-strong);border-radius:14px;background:#fff;cursor:pointer;color:var(--ink-soft);}
-  .chip:hover{border-color:var(--ink);}
-  .chip.sel-well{background:var(--moss-bg);border-color:var(--moss);color:var(--moss-ink);}
-  .chip.sel-wrong{background:var(--rust-bg);border-color:var(--rust);color:var(--rust-ink);}
-  .star-pick{display:flex;gap:4px;font-size:22px;cursor:pointer;color:var(--line-strong);margin-bottom:10px;}
-  .star-pick span.active{color:var(--amber-ink);}
-
-  .save-note{font-size:11px;color:var(--ink-soft);text-align:center;margin-top:6px;min-height:14px;}
-  .hint{font-size:11px;color:var(--ink-soft);margin-top:-8px;margin-bottom:10px;}
-
-  .research-links{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-  .rlink{font-size:11px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border:1px solid var(--line-strong);border-radius:12px;color:var(--ink-soft);text-decoration:none;}
-  .rlink:hover{border-color:var(--ink);color:var(--ink);}
-
-  .week-chart{display:flex;align-items:flex-end;gap:8px;height:150px;padding:10px 4px 0;border-bottom:1px solid var(--line-strong);}
-  .week-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
-  .week-bar-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);margin-bottom:3px;}
-  .week-bar{width:100%;background:var(--ink);border-radius:2px 2px 0 0;min-height:2px;}
-  .week-bar-label{font-size:9px;color:var(--ink-soft);margin-top:5px;white-space:nowrap;}
-
-  #printSheet{display:none;}
-  @media print{
-    body *{visibility:hidden;}
-    #printSheet, #printSheet *{visibility:visible;}
-    #printSheet{display:block;position:absolute;left:0;top:0;width:100%;padding:20px;font-family:'Inter',sans-serif;color:#000;}
-    #printSheet h1{font-family:'IBM Plex Mono',monospace;font-size:22px;margin:0 0 2px;}
-    #printSheet h2{font-family:'IBM Plex Mono',monospace;font-size:14px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:0.5px;}
-    #printSheet .ps-role{font-size:14px;color:#444;margin:0 0 4px;}
-    #printSheet .ps-meta{font-size:12px;color:#555;margin:0 0 4px;}
-    #printSheet .ps-log{border-bottom:1px solid #ccc;padding-bottom:10px;margin-bottom:12px;}
-    #printSheet .ps-log-head{font-weight:600;margin-bottom:4px;}
-    #printSheet .ps-tags{font-size:11px;color:#666;}
-    #printSheet p{font-size:13px;line-height:1.5;}
+  .calendar-app-company{
+    font-size:8px;
   }
+
+  .calendar-date{
+    font-size:9px;
+  }
+}
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Job search ledger</h1>
-      <p class="subtitle">Track applications, log interviews, note what worked. Press <b style="font-family:'IBM Plex Mono',monospace;font-weight:600;">N</b> to add, <b style="font-family:'IBM Plex Mono',monospace;font-weight:600;">/</b> to search.</p>
-    </div>
-    <div class="stats" id="stats"></div>
-  </header>
-
-  <div class="tabs" id="tabs">
-    <button class="tab-btn active" data-view="board">Board</button>
-    <button class="tab-btn" data-view="timeline">Timeline</button>
-    <button class="tab-btn" data-view="stats">Stats</button>
-    <button class="tab-btn" data-view="patterns">Patterns</button>
-  </div>
-
-  <div class="toolbar">
-    <div class="toolbar-left">
-      <input class="search" id="search" placeholder="Search company or role...">
-      <select class="sel" id="sortSel">
-        <option value="newest">Newest first</option>
-        <option value="oldest">Oldest first</option>
-        <option value="company">Company A–Z</option>
-        <option value="followup">Needs follow-up first</option>
-      </select>
-      <button class="btn-ghost" id="followupToggle">Needs follow-up</button>
-      <button class="btn-ghost" id="archiveToggle">Show archived</button>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn-ghost" id="exportBtn">Export backup</button>
-      <button class="btn-ghost" id="importBtn">Import backup</button>
-      <input type="file" id="importFile" accept="application/json" style="display:none;">
-      <button class="btn-primary" id="addBtn">+ Log application</button>
-    </div>
-  </div>
-
-  <div id="viewRoot"></div>
-  <div class="save-note" id="saveNote"></div>
+<body class="auth-locked">
+<div id="authGate" class="auth-gate"><div class="auth-card">
+<h1 id="authTitle">Sign in</h1><p id="authSubtitle">Use your email and 6-digit PIN to access your job applications.</p>
+<form id="authForm"><label>Email</label><input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+<div id="pinBlock"><label>6-digit PIN</label><input id="pin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required placeholder="••••••"></div>
+<div id="newPinBlock" class="hidden"><label>New 6-digit PIN</label><input id="newPin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}"><label>Confirm PIN</label><input id="newPin2" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}"></div>
+<button id="authSubmit" class="auth-primary" type="submit">Sign in</button><button id="forgot" class="auth-link" type="button">Forgot PIN?</button><button id="toggleAuth" class="secondary" type="button" style="width:100%">Create account</button><div id="authMsg" class="auth-msg"></div></form>
+</div></div>
+<div id="app" class="hidden"><div class="wrap">
+<header><div class="brand"><h1>Job Application Tracker</h1><p class="subtitle">Cloud-synced job applications. Your data is private to your account.</p></div><div class="userbox"><span id="userEmail" class="useremail"></span><button id="logout" class="ghost">Log out</button></div><div id="stats" class="stats"></div></header>
+<div class="tabs">
+  <button class="tab active" data-view="board">Board</button>
+  <button class="tab" data-view="list">All applications</button>
+  <button class="tab" data-view="calendar">Calendar</button>
+  <button class="tab" data-view="stats">Stats</button>
 </div>
+<div class="toolbar"><div class="toolbar-left"><input id="search" class="search" placeholder="Search company or role..."><select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="company">Company A-Z</option></select><button id="add" class="primary">+ Log application</button></div><div class="toolbar-right"><button id="export" class="ghost">Export backup</button><button id="importBtn" class="ghost">Import backup</button><input id="importFile" type="file" accept="application/json" class="hidden"></div></div>
+<div id="root"></div><div id="notice" class="notice"></div></div></div>
+<div id="modalBack" class="modalback hidden"><div class="modal" id="modal"></div></div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
+import { firebaseConfig } from './firebase-config.js';
 
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal"></div>
-</div>
-<div id="printSheet"></div>
-
-<script>
-const STATUSES = ["Applied","Interviewing","Offer","Rejected"];
-const ROUND_TYPES = ["Phone screen","Technical","Onsite","Final round","Behavioral","Recruiter call","Take-home","Other"];
-const TAG_OPTIONS = ["Technical depth","Communication","Behavioral answers","Confidence","Culture fit","Salary negotiation","Preparation","Domain knowledge","Problem solving","Time management"];
-const STORAGE_KEY = 'job-search-ledger-applications';
-
-let apps = [];
-let currentView = 'board';
-let followUpOnly = false;
-let showArchived = false;
-let sortMode = 'newest';
-
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function todayStr(){ return new Date().toISOString().slice(0,10); }
-function daysBetween(d1, d2){
-  const a = new Date(d1+"T00:00:00"), b = new Date(d2+"T00:00:00");
-  if(isNaN(a)||isNaN(b)) return null;
-  return Math.round((b-a)/86400000);
+const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
+const STATUSES=['Applied','Interviewing','Offer','Rejected']; let user=null,apps=[],view='board',authMode='signin',resetMode=false,  calendarDate=new Date();
+const $=id=>document.getElementById(id); const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const today=()=>new Date().toISOString().slice(0,10); const validPin=p=>/^\d{6}$/.test(p||'');
+function msg(t,ok=false){$('authMsg').textContent=t||'';$('authMsg').style.color=ok?'var(--green)':'var(--red)'}
+function setAuth(mode){authMode=mode;resetMode=false;$('pinBlock').classList.remove('hidden');$('newPinBlock').classList.add('hidden');$('authTitle').textContent=mode==='signup'?'Create account':'Sign in';$('authSubtitle').textContent=mode==='signup'?'Create an account with your email and a 6-digit PIN.':'Use your email and 6-digit PIN to access your job applications.';$('authSubmit').textContent=mode==='signup'?'Create account':'Sign in';$('forgot').classList.toggle('hidden',mode==='signup');$('toggleAuth').textContent=mode==='signup'?'Back to sign in':'Create account';msg('')}
+function setReset(){resetMode=true;authMode='reset';$('pinBlock').classList.add('hidden');$('newPinBlock').classList.add('hidden');$('authTitle').textContent='Reset PIN';$('authSubtitle').textContent='We will send a secure reset link to your email.';$('authSubmit').textContent='Send reset email';$('forgot').classList.add('hidden');$('toggleAuth').classList.remove('hidden');$('toggleAuth').textContent='Back to sign in';msg('')}
+function showApp(u){user=u;$('authGate').classList.add('hidden');$('app').classList.remove('hidden');document.body.classList.remove('auth-locked');$('userEmail').textContent=u.email||'';loadApps()}
+function showAuth(){user=null;apps=[];$('app').classList.add('hidden');$('authGate').classList.remove('hidden');document.body.classList.add('auth-locked');setAuth('signin')}
+function appCollection(){return collection(db,'users',user.uid,'applications')}
+function normalize(id,d){return {id,company:d.company||'',role:d.role||'',dateApplied:d.dateApplied||today(),status:d.status||'Applied',link:d.link||'',resumeVersion:d.resumeVersion||'',coverLetterNotes:d.coverLetterNotes||'',notes:d.notes||'',archived:!!d.archived,logs:Array.isArray(d.logs)?d.logs:[],statusUpdatedAt:d.statusUpdatedAt||d.dateApplied||today()}}
+async function loadApps(){if(!user)return;try{const snap=await getDocs(query(appCollection(),orderBy('dateApplied','desc')));apps=snap.docs.map(d=>normalize(d.id,d.data()));render()}catch(e){console.error(e);setNotice('Firebase error: '+friendlyError(e))}}
+function friendlyError(e){const code=e?.code||'';const map={'auth/invalid-credential':'Incorrect email or PIN.','auth/email-already-in-use':'An account already exists for this email.','auth/weak-password':'Firebase rejected the PIN. Check your Firebase password policy.','auth/invalid-email':'Enter a valid email address.','auth/too-many-requests':'Too many attempts. Try again later.','auth/user-not-found':'No account exists for this email.','auth/wrong-password':'Incorrect email or PIN.','auth/network-request-failed':'Network request failed. Check your internet connection.','permission-denied':'Firestore denied access. Check Firestore rules and sign-in status.'};return map[code]||e?.message||'Something went wrong.'}
+async function save(a){
+  if(!user)return false;
+  try{
+    const ref=a.id?doc(appCollection(),a.id):doc(appCollection());
+    const data={company:a.company,role:a.role,dateApplied:a.dateApplied,status:a.status,statusUpdatedAt:a.statusUpdatedAt||a.dateApplied,link:a.link||'',resumeVersion:a.resumeVersion||'',coverLetterNotes:a.coverLetterNotes||'',notes:a.notes||'',archived:!!a.archived,logs:a.logs||[],updatedAt:serverTimestamp()};
+    if(!a.id)data.createdAt=serverTimestamp();
+    await setDoc(ref,data,{merge:true});
+    const saved=normalize(ref.id,{...data,createdAt:null,updatedAt:null});
+    const index=apps.findIndex(x=>x.id===ref.id);
+    if(index===-1)apps.push(saved);else apps[index]=saved;
+    render();setNotice('Saved to Firebase');return true;
+  }catch(e){console.error('Firebase save failed:',e);alert(friendlyError(e));return false}
 }
-function daysSince(d){ return daysBetween(d, todayStr()); }
-function fmtDate(d){
-  if(!d) return "";
-  const dt = new Date(d+"T00:00:00");
-  if(isNaN(dt)) return d;
-  return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-}
-function esc(s){ return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+async function remove(a){if(!confirm('Delete this application?'))return;try{await deleteDoc(doc(appCollection(),a.id));apps=apps.filter(x=>x.id!==a.id);render();setNotice('Deleted')}catch(e){alert(friendlyError(e))}}
+function filtered(){const q=$('search').value.trim().toLowerCase();let x=apps.filter(a=>!a.archived&&(!q||a.company.toLowerCase().includes(q)||a.role.toLowerCase().includes(q)));const s=$('sort').value;if(s==='newest')x.sort((a,b)=>b.dateApplied.localeCompare(a.dateApplied));if(s==='oldest')x.sort((a,b)=>a.dateApplied.localeCompare(b.dateApplied));if(s==='company')x.sort((a,b)=>a.company.localeCompare(b.company));return x}
+function badge(s){return `<span class="badge ${s.toLowerCase()}">${esc(s)}</span>`}
+function renderStats(){const active=apps.filter(a=>a.status==='Applied'||a.status==='Interviewing').length,offers=apps.filter(a=>a.status==='Offer').length,rejected=apps.filter(a=>a.status==='Rejected').length;$('stats').innerHTML=`<div class="stat"><b>${apps.length}</b><span>Total</span></div><div class="stat"><b>${active}</b><span>Active</span></div><div class="stat"><b>${offers}</b><span>Offers</span></div><div class="stat"><b>${rejected}</b><span>Rejected</span></div>`}
 
-function researchLinksHTML(company){
-  const q = encodeURIComponent(company||'');
-  if(!company) return '';
-  return `
-    <div class="research-links" onclick="event.stopPropagation()">
-      <a href="https://www.glassdoor.com/Search/results.htm?keyword=${q}" target="_blank" rel="noopener" class="rlink">Glassdoor</a>
-      <a href="https://www.linkedin.com/search/results/companies/?keywords=${q}" target="_blank" rel="noopener" class="rlink">LinkedIn</a>
-      <a href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener" class="rlink">Search</a>
+function daysSinceApplied(a){
+  if(!a.dateApplied)return null;
+  const d=new Date(`${a.dateApplied}T00:00:00`);
+  if(Number.isNaN(d.getTime()))return null;
+  const now=new Date();
+  const todayDate=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  return Math.max(0,Math.floor((todayDate-d)/86400000));
+}
+
+function needsFollowUp(a){
+  const days=daysSinceApplied(a);
+  return days!==null && days>=7 && a.status==='Applied';
+}
+
+function card(a){
+  const q=encodeURIComponent(`${a.company} ${a.role}`.trim());
+  const companyQ=encodeURIComponent(`"${a.company}" official careers`);
+  const linkedin=`https://www.linkedin.com/jobs/search/?keywords=${q}`;
+  const glassdoor=`https://www.glassdoor.co.in/Job/jobs.htm?sc.keyword=${q}`;
+  const companySearch=`https://www.google.com/search?q=${companyQ}`;
+  const days=daysSinceApplied(a);
+  const followUp=needsFollowUp(a);
+
+  return `<div class="card" draggable="true" data-id="${a.id}">
+    <div class="cardtop">
+      <div><div class="company">${esc(a.company)}</div><div class="role">${esc(a.role)}</div></div>
+      ${badge(a.status)}
     </div>
-  `;
+    <div class="meta">
+      <span>${esc(a.dateApplied)}</span>
+      <span>${days===null?'':`${days} day${days===1?'':'s'} since applied`}</span>
+      <span>${a.logs.length} interview${a.logs.length===1?'':'s'}</span>
+    </div>
+    ${followUp?`<div class="followup-alert"><strong>FOLLOW UP</strong> · ${days} days since applied with no response</div>`:''}
+    <div class="research-links">
+      <a href="${linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="${glassdoor}" target="_blank" rel="noopener noreferrer">Glassdoor</a>
+      <a href="${companySearch}" target="_blank" rel="noopener noreferrer">Company site</a>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+      <button class="ghost edit" data-id="${a.id}">Edit</button>
+      
+      <button class="danger del" data-id="${a.id}">Delete</button>
+    </div>
+  </div>`
+}
+function renderBoard(){let list=filtered();$('root').innerHTML=`<div class="board">${STATUSES.map(s=>{const items=list.filter(a=>a.status===s);return `<section class="col" data-status="${s}"><div class="colhead"><span>${s}</span><span>${items.length}</span></div><div class="cards">${items.length?items.map(card).join(''):'<div class="empty" style="padding:28px 8px">No applications</div>'}</div></section>`}).join('')}</div>`}
+function renderList(){const list=filtered();$('root').innerHTML=list.length?`<div class="listview">${list.map(a=>`<div class="listrow"><div><h3>${esc(a.company)} — ${esc(a.role)}</h3><p>${esc(a.dateApplied)} · ${badge(a.status)}</p><p>${esc(a.notes||'No notes')}</p></div><div class="listactions"><button class="ghost edit" data-id="${a.id}">Edit</button><button class="danger del" data-id="${a.id}">Delete</button></div></div>`).join('')}</div>`:`<div class="empty"><h2>No applications logged yet</h2><p>Log your first application to start tracking.</p></div>`}
+function formatDateKey(year,month,day){
+  return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 }
 
-function printPrepSheet(app){
-  const sheet = document.getElementById('printSheet');
-  const logs = (app.logs||[]).slice().sort((a,b)=> (a.date||"").localeCompare(b.date||""));
-  sheet.innerHTML = `
-    <h1>${esc(app.company)}</h1>
-    <p class="ps-role">${esc(app.role)}</p>
-    <p class="ps-meta">Applied ${fmtDate(app.dateApplied)} &middot; Status: ${esc(app.status)}${app.link?` &middot; ${esc(app.link)}`:''}</p>
-    ${app.resumeVersion || app.coverLetterNotes ? `<p class="ps-meta">${app.resumeVersion?('Resume: '+esc(app.resumeVersion)):''}${app.resumeVersion&&app.coverLetterNotes?' &middot; ':''}${app.coverLetterNotes?('Cover letter: '+esc(app.coverLetterNotes)):''}</p>` : ''}
-    ${app.notes ? `<h2>Notes</h2><p>${esc(app.notes)}</p>` : ''}
-    <h2>Interview history</h2>
-    ${logs.length ? logs.map(l=>`
-      <div class="ps-log">
-        <p class="ps-log-head">${esc(l.round||'Interview')} &mdash; ${fmtDate(l.date)}${l.rating?(' &middot; '+l.rating+'/5'):''}</p>
-        ${l.wentWell?`<p><strong>Went well:</strong> ${esc(l.wentWell)}</p>`:''}
-        ${l.wentWrong?`<p><strong>To improve:</strong> ${esc(l.wentWrong)}</p>`:''}
-        ${(l.wellTags||[]).concat(l.wrongTags||[]).length ? `<p class="ps-tags">Tags: ${[...(l.wellTags||[]),...(l.wrongTags||[])].map(esc).join(', ')}</p>` : ''}
+function calendarMonthName(date){
+  return date.toLocaleDateString('en-IN',{
+    month:'long',
+    year:'numeric'
+  });
+}
+
+function renderCalendar(){
+
+  const year=calendarDate.getFullYear();
+  const month=calendarDate.getMonth();
+
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+
+  // Calendar starts on Sunday.
+  const startOffset=firstDay.getDay();
+
+  // Always display complete weeks.
+  const totalCells=Math.ceil((startOffset+lastDay.getDate())/7)*7;
+
+  const todayKey=today();
+
+  let html=`
+    <div class="calendar-wrap">
+
+      <div class="calendar-header">
+
+        <button class="ghost cal-prev" type="button">
+          ← Previous
+        </button>
+
+        <h2 class="calendar-title">
+          ${esc(calendarMonthName(calendarDate))}
+        </h2>
+
+        <button class="ghost cal-next" type="button">
+          Next →
+        </button>
+
       </div>
-    `).join('') : '<p>No interviews logged yet.</p>'}
+
+      <div class="calendar-grid">
+
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+          .map(day=>`
+            <div class="calendar-weekday">
+              ${day}
+            </div>
+          `).join('')}
+
   `;
-  window.print();
-}
 
-function weeklyBuckets(){
-  const dated = apps.filter(a=>a.dateApplied).map(a=>a.dateApplied).sort();
-  if(!dated.length) return [];
-  const start = new Date(dated[0]+"T00:00:00");
-  const day0 = (start.getDay()+6)%7;
-  start.setDate(start.getDate()-day0);
-  const end = new Date();
-  const buckets = [];
-  let cur = new Date(start);
-  while(cur <= end){
-    const wStart = new Date(cur);
-    const wEnd = new Date(cur); wEnd.setDate(wEnd.getDate()+6);
-    const count = apps.filter(a=>{
-      if(!a.dateApplied) return false;
-      const d = new Date(a.dateApplied+"T00:00:00");
-      return d>=wStart && d<=wEnd;
-    }).length;
-    buckets.push({label: wStart.toLocaleDateString('en-US',{month:'short',day:'numeric'}), count});
-    cur.setDate(cur.getDate()+7);
+  for(let i=0;i<totalCells;i++){
+
+    const dayNumber=i-startOffset+1;
+
+    const cellDate=new Date(year,month,dayNumber);
+
+    const cellYear=cellDate.getFullYear();
+    const cellMonth=cellDate.getMonth();
+    const cellDay=cellDate.getDate();
+
+    const key=formatDateKey(
+      cellYear,
+      cellMonth,
+      cellDay
+    );
+
+    const isCurrentMonth=cellMonth===month;
+    const isToday=key===todayKey;
+
+    const dayApps=apps.filter(a=>
+      !a.archived &&
+      a.dateApplied===key
+    );
+
+    html+=`
+      <div class="calendar-day
+        ${isCurrentMonth?'':'other-month'}
+        ${isToday?'today':''}"
+        data-date="${key}">
+
+        <div class="calendar-date">
+          ${cellDay}
+        </div>
+
+        <div class="calendar-apps">
+
+          ${dayApps.slice(0,4).map(a=>`
+            <button
+              type="button"
+              class="calendar-app ${a.status.toLowerCase()}"
+              data-calendar-id="${a.id}"
+              title="${esc(a.company)} — ${esc(a.role)}"
+            >
+              <span class="calendar-app-company">
+                ${esc(a.company)}
+              </span>
+
+              <span class="calendar-app-role">
+                ${esc(a.role)}
+              </span>
+            </button>
+          `).join('')}
+
+          ${dayApps.length>4
+            ? `<div class="calendar-more">
+                +${dayApps.length-4} more
+              </div>`
+            : ''
+          }
+
+        </div>
+      </div>
+    `;
   }
-  return buckets.slice(-10);
-}
 
-function lastActivityDate(app){
-  if(app.logs && app.logs.length){
-    return app.logs.reduce((max,l)=> (l.date && l.date>max) ? l.date : max, app.logs[0].date || app.dateApplied);
-  }
-  return app.dateApplied;
-}
-function needsFollowUp(app){
-  if(app.archived) return false;
-  if(app.status!=='Applied' && app.status!=='Interviewing') return false;
-  const d = daysSince(lastActivityDate(app));
-  return d !== null && d >= 7;
-}
-
-/* ---------- persistence ---------- */
-function loadData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    apps = raw ? JSON.parse(raw) : [];
-  }catch(e){ apps = []; }
-  apps.forEach(a=>{
-    if(a.archived===undefined) a.archived=false;
-    if(!a.statusUpdatedAt) a.statusUpdatedAt = a.dateApplied;
-    if(!a.logs) a.logs=[];
-    a.logs.forEach(l=>{ if(!l.wellTags) l.wellTags=[]; if(!l.wrongTags) l.wrongTags=[]; if(l.rating===undefined) l.rating=0; });
-  });
-  render();
-}
-function saveData(){
-  const note = document.getElementById('saveNote');
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-    note.textContent = "Saved to this browser";
-    setTimeout(()=>{ if(note.textContent==="Saved to this browser") note.textContent=""; }, 1200);
-  }catch(e){
-    note.textContent = "Couldn't save — your browser may be blocking local storage.";
-  }
-}
-function exportData(){
-  const blob = new Blob([JSON.stringify(apps, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'job-applications-backup.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-function importData(file){
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const parsed = JSON.parse(reader.result);
-      if(!Array.isArray(parsed)) throw new Error('bad format');
-      apps = parsed;
-      saveData(); render();
-    }catch(e){
-      alert("Couldn't read that file — make sure it's a backup exported from this tool.");
-    }
-  };
-  reader.readAsText(file);
-}
-
-function setStatus(app, newStatus){
-  if(app.status !== newStatus){
-    app.status = newStatus;
-    app.statusUpdatedAt = todayStr();
-  }
-}
-
-/* ---------- header stats ---------- */
-function renderHeaderStats(){
-  const active = apps.filter(a=>!a.archived && (a.status==='Applied'||a.status==='Interviewing')).length;
-  const offers = apps.filter(a=>!a.archived && a.status==='Offer').length;
-  const flagged = apps.filter(needsFollowUp).length;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat"><span class="num">${apps.filter(a=>!a.archived).length}</span><span class="lab">Total</span></div>
-    <div class="stat"><span class="num">${active}</span><span class="lab">Active</span></div>
-    <div class="stat"><span class="num">${offers}</span><span class="lab">Offers</span></div>
-    <div class="stat flag"><span class="num">${flagged}</span><span class="lab">Follow up</span></div>
+  html+=`
+      </div>
+    </div>
   `;
-}
 
-/* ---------- filtering / sorting ---------- */
-function getFiltered(){
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  let list = apps.filter(a=>{
-    if(!showArchived && a.archived) return false;
-    if(showArchived && !a.archived) return true;
-    if(q && !((a.company||"").toLowerCase().includes(q) || (a.role||"").toLowerCase().includes(q))) return false;
-    if(followUpOnly && !needsFollowUp(a)) return false;
-    return true;
-  });
-  return list;
+  $('root').innerHTML=html;
 }
-function sortList(list){
-  const arr = list.slice();
-  if(sortMode==='newest') arr.sort((a,b)=> (b.dateApplied||"").localeCompare(a.dateApplied||""));
-  else if(sortMode==='oldest') arr.sort((a,b)=> (a.dateApplied||"").localeCompare(b.dateApplied||""));
-  else if(sortMode==='company') arr.sort((a,b)=> (a.company||"").localeCompare(b.company||""));
-  else if(sortMode==='followup') arr.sort((a,b)=> (needsFollowUp(b)?1:0) - (needsFollowUp(a)?1:0) || (a.dateApplied||"").localeCompare(b.dateApplied||""));
-  return arr;
-}
+function renderAnalytics(){
+  const total=apps.length,
+    offers=apps.filter(a=>a.status==='Offer').length,
+    interviews=apps.filter(a=>a.status==='Interviewing').length,
+    rejected=apps.filter(a=>a.status==='Rejected').length,
+    applied=apps.filter(a=>a.status==='Applied').length;
 
-/* ---------- main render dispatch ---------- */
+  // Build the last 8 Monday-Sunday weeks, including the current week.
+  const now=new Date();
+  const localToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const mondayOffset=(localToday.getDay()+6)%7;
+  const currentMonday=new Date(localToday);
+  currentMonday.setDate(localToday.getDate()-mondayOffset);
+
+  const weeks=[];
+  for(let i=7;i>=0;i--){
+    const start=new Date(currentMonday);
+    start.setDate(currentMonday.getDate()-(i*7));
+    const end=new Date(start);
+    end.setDate(start.getDate()+6);
+
+    const startKey=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+    const endKey=`${end.getFullYear()}-${String(end.getMonth()+1).padStart(2,'0')}-${String(end.getDate()).padStart(2,'0')}`;
+
+    const count=apps.filter(a=>a.dateApplied>=startKey&&a.dateApplied<=endKey).length;
+
+    const label=`${start.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}`;
+    weeks.push({startKey,endKey,count,label});
+  }
+
+  const maxCount=Math.max(1,...weeks.map(w=>w.count));
+
+  const chart=`
+    <div class="weekly-chart">
+      <h3>Applications per week</h3>
+      <div class="chart-subtitle">Your application volume over the last 8 weeks</div>
+      ${weeks.some(w=>w.count)
+        ? `<div class="week-bars">${weeks.map(w=>{
+            const height=Math.max(3,Math.round((w.count/maxCount)*145));
+            return `<div class="week-bar-wrap">
+              <div class="week-count">${w.count}</div>
+              <div class="week-bar-track"><div class="week-bar" style="height:${height}px" title="${w.count} application${w.count===1?'':'s'}"></div></div>
+              <div class="week-label">${esc(w.label)}</div>
+            </div>`;
+          }).join('')}</div>`
+        : `<div class="weekly-empty">No applications recorded in the last 8 weeks.</div>`
+      }
+    </div>`;
+
+  $('root').innerHTML=`
+    <div class="metricgrid">
+      <div class="metric"><b>${total}</b><span>Total applications</span></div>
+      <div class="metric"><b>${applied}</b><span>Applied</span></div>
+      <div class="metric"><b>${interviews}</b><span>Interviewing</span></div>
+      <div class="metric"><b>${offers}</b><span>Offers</span></div>
+      <div class="metric"><b>${rejected}</b><span>Rejected</span></div>
+      <div class="metric"><b>${total?Math.round((offers/total)*100):0}%</b><span>Offer rate</span></div>
+    </div>
+    ${chart}`;
+}
 function render(){
-  renderHeaderStats();
-  document.querySelectorAll('.tab-btn').forEach(b=> b.classList.toggle('active', b.dataset.view===currentView));
-  document.getElementById('followupToggle').classList.toggle('on', followUpOnly);
-  document.getElementById('archiveToggle').classList.toggle('on', showArchived);
-  const root = document.getElementById('viewRoot');
-  if(currentView==='board') root.innerHTML = boardHTML();
-  else if(currentView==='timeline') root.innerHTML = timelineHTML();
-  else if(currentView==='stats') root.innerHTML = statsHTML();
-  else if(currentView==='patterns') root.innerHTML = patternsHTML();
-  wireViewEvents();
-}
+  renderStats();
 
-/* ---------- BOARD ---------- */
-function cardHTML(a){
-  const flagged = needsFollowUp(a);
-  const d = daysSince(a.dateApplied);
-  return `
-    <div class="card" data-id="${a.id}" draggable="true">
-      <div class="card-top">
-        <p class="co" style="margin:0;">${esc(a.company)}</p>
-        <button class="edit-pencil" data-edit="${a.id}" title="Quick edit">&#9998;</button>
-      </div>
-      <p class="role">${esc(a.role)}</p>
-      <div class="meta">
-        <span class="date">${d===null?'':d+'d ago'}</span>
-        ${a.logs && a.logs.length ? `<span>${a.logs.length} interview${a.logs.length>1?'s':''}</span>` : ''}
-      </div>
-      ${researchLinksHTML(a.company)}
-      ${flagged ? '<span class="followup-flag">Needs follow-up</span>' : ''}
-    </div>
-  `;
-}
-function boardHTML(){
-  const filtered = sortList(getFiltered());
-  if(apps.length===0){
-    return `<div class="empty-state"><h3>No applications logged yet</h3><p>Log your first application to start tracking.</p></div>`;
+  if(view==='board'){
+    renderBoard();
   }
-  const cols = showArchived ? ['Archived'] : STATUSES;
-  const colsHTML = cols.map(status=>{
-    const items = status==='Archived' ? filtered : filtered.filter(a=>a.status===status);
-    const cards = items.map(cardHTML).join('');
-    return `
-      <div class="col" data-status="${status}">
-        <div class="col-head"><span class="col-title">${status}</span><span class="col-count">${items.length}</span></div>
-        <div class="col-body" data-status="${status}">${cards || '<div class="empty-col">Nothing here</div>'}</div>
-      </div>
-    `;
-  }).join('');
-  return `<div class="board">${colsHTML}</div>`;
-}
-
-/* ---------- TIMELINE ---------- */
-function timelineHTML(){
-  const list = sortList(getFiltered().slice()).sort((a,b)=> (b.dateApplied||"").localeCompare(a.dateApplied||""));
-  if(list.length===0) return `<div class="empty-state"><h3>Nothing to show</h3><p>Try clearing filters or logging an application.</p></div>`;
-  const items = list.map(a=>{
-    const flagged = needsFollowUp(a);
-    return `
-      <div class="tl-item" data-id="${a.id}">
-        <div class="tl-date">${fmtDate(a.dateApplied)}</div>
-        <div class="tl-title">${esc(a.company)}</div>
-        <div class="tl-role">${esc(a.role)}</div>
-        <div class="tl-meta">
-          <span class="badge b-${a.status.toLowerCase()}">${a.status}</span>
-          ${a.logs.length ? `<span style="font-size:11.5px;color:var(--ink-soft);">${a.logs.length} interview${a.logs.length>1?'s':''}</span>` : ''}
-          ${flagged ? '<span class="followup-flag">Needs follow-up</span>' : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-  return `<div class="timeline">${items}</div>`;
-}
-
-/* ---------- STATS ---------- */
-function statsHTML(){
-  const all = apps;
-  const total = all.length;
-  if(total===0) return `<div class="empty-state"><h3>No data yet</h3><p>Stats will show up once you've logged applications.</p></div>`;
-  const responded = all.filter(a=> a.status!=='Applied').length;
-  const interviewed = all.filter(a=> (a.logs && a.logs.length>0) || a.status==='Interviewing' || a.status==='Offer').length;
-  const offers = all.filter(a=> a.status==='Offer').length;
-  const rejected = all.filter(a=> a.status==='Rejected');
-  const offered = all.filter(a=> a.status==='Offer');
-  const avgDaysOffer = offered.length ? Math.round(offered.reduce((s,a)=> s+(daysBetween(a.dateApplied, a.statusUpdatedAt)||0),0)/offered.length) : null;
-  const avgDaysRejected = rejected.length ? Math.round(rejected.reduce((s,a)=> s+(daysBetween(a.dateApplied, a.statusUpdatedAt)||0),0)/rejected.length) : null;
-
-  const pct = (n)=> total ? Math.round(n/total*100) : 0;
-  const funnelMax = total;
-  const funnel = [
-    {label:'Applied', count: total},
-    {label:'Interviewed', count: interviewed},
-    {label:'Offer', count: offers}
-  ];
-
-  return `
-    <div class="metric-grid">
-      <div class="metric-card"><span class="m-num">${total}</span><span class="m-lab">Total applications</span></div>
-      <div class="metric-card"><span class="m-num">${pct(responded)}%</span><span class="m-lab">Response rate</span></div>
-      <div class="metric-card"><span class="m-num">${pct(interviewed)}%</span><span class="m-lab">Interview conversion</span></div>
-      <div class="metric-card"><span class="m-num">${pct(offers)}%</span><span class="m-lab">Offer rate</span></div>
-      <div class="metric-card"><span class="m-num">${avgDaysOffer===null?'—':avgDaysOffer+'d'}</span><span class="m-lab">Avg days to offer</span></div>
-      <div class="metric-card"><span class="m-num">${avgDaysRejected===null?'—':avgDaysRejected+'d'}</span><span class="m-lab">Avg days to rejection</span></div>
-    </div>
-    <h3 class="section-h">Funnel</h3>
-    <div class="funnel">
-      ${funnel.map(f=>`
-        <div class="funnel-row">
-          <span>${f.label}</span>
-          <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:${funnelMax? Math.round(f.count/funnelMax*100):0}%"></div></div>
-          <span class="funnel-count">${f.count}</span>
-        </div>
-      `).join('')}
-    </div>
-    <h3 class="section-h">Applications per week</h3>
-    ${weekChartHTML()}
-  `;
-}
-
-function weekChartHTML(){
-  const buckets = weeklyBuckets();
-  if(!buckets.length) return `<p style="font-size:12.5px;color:var(--ink-soft);">Not enough data yet.</p>`;
-  const max = Math.max(1, ...buckets.map(b=>b.count));
-  return `
-    <div class="week-chart">
-      ${buckets.map(b=>`
-        <div class="week-bar-col">
-          <span class="week-bar-num">${b.count}</span>
-          <div class="week-bar" style="height:${Math.max(2, Math.round(b.count/max*100))}%"></div>
-          <span class="week-bar-label">${b.label}</span>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-/* ---------- PATTERNS ---------- */
-function patternsHTML(){
-  const wellCounts = {}, wrongCounts = {};
-  apps.forEach(a=> (a.logs||[]).forEach(l=>{
-    (l.wellTags||[]).forEach(t=> wellCounts[t]=(wellCounts[t]||0)+1);
-    (l.wrongTags||[]).forEach(t=> wrongCounts[t]=(wrongCounts[t]||0)+1);
-  }));
-  const wellArr = Object.entries(wellCounts).sort((a,b)=>b[1]-a[1]);
-  const wrongArr = Object.entries(wrongCounts).sort((a,b)=>b[1]-a[1]);
-  const maxCount = Math.max(1, ...wellArr.map(x=>x[1]), ...wrongArr.map(x=>x[1]));
-
-  if(wellArr.length===0 && wrongArr.length===0){
-    return `<div class="empty-state"><h3>No patterns yet</h3><p>Tag what went well or wrong when you log an interview, and recurring themes will show up here.</p></div>`;
+  else if(view==='list'){
+    renderList();
   }
-  const renderList = (arr, cls) => arr.length ? arr.map(([tag,count])=>`
-    <div class="pattern-row">
-      <span>${esc(tag)}</span>
-      <span class="pattern-count">${count}&times;</span>
-      <div class="pattern-bar-wrap"><div class="pattern-bar ${cls}" style="width:${Math.round(count/maxCount*100)}%"></div></div>
-    </div>
-  `).join('') : `<p style="font-size:12.5px;color:var(--ink-soft);">Nothing tagged yet.</p>`;
-
-  return `
-    <div class="pattern-cols">
-      <div>
-        <h3 class="section-h">What's working</h3>
-        <div class="pattern-list">${renderList(wellArr,'well')}</div>
-      </div>
-      <div>
-        <h3 class="section-h">What to work on</h3>
-        <div class="pattern-list">${renderList(wrongArr,'wrong')}</div>
-      </div>
-    </div>
-  `;
+  else if(view==='calendar'){
+    renderCalendar();
+  }
+  else if(view==='stats'){
+    renderAnalytics();
+  }
+}
+function setNotice(t){$('notice').textContent=t;clearTimeout(setNotice.t);setNotice.t=setTimeout(()=>{$('notice').textContent=''},2600)}
+function openModal(a=null){const x=a||{company:'',role:'',dateApplied:today(),status:'Applied',link:'',resumeVersion:'',coverLetterNotes:'',notes:'',archived:false,logs:[],statusUpdatedAt:today()};$('modal').innerHTML=`<h2>${a?'Edit application':'Log application'}</h2><form id="appForm"><div class="row"><div class="field"><label>Company</label><input id="fCompany" required value="${esc(x.company)}"></div><div class="field"><label>Role</label><input id="fRole" required value="${esc(x.role)}"></div></div><div class="row"><div class="field"><label>Date applied</label><input id="fDate" type="date" required value="${esc(x.dateApplied)}"></div><div class="field"><label>Status</label><select id="fStatus">${STATUSES.map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select></div></div><div class="field"><label>Job link</label><input id="fLink" type="url" value="${esc(x.link)}" placeholder="https://..."></div><div class="row"><div class="field"><label>Resume version</label><input id="fResume" value="${esc(x.resumeVersion)}"></div><div class="field"><label>Interview log</label><input id="fLog" placeholder="e.g. HR call — 20 Aug"></div></div><div class="field"><label>Cover letter notes</label><textarea id="fCover">${esc(x.coverLetterNotes)}</textarea></div><div class="field"><label>Notes</label><textarea id="fNotes">${esc(x.notes)}</textarea></div><div class="actions"><button type="button" class="ghost" id="cancelModal">Cancel</button><button class="primary" type="submit">Save application</button></div></form>`;$('modalBack').classList.remove('hidden');$('appForm').onsubmit=async e=>{e.preventDefault();const a={...x,id:x.id,company:$('fCompany').value.trim(),role:$('fRole').value.trim(),dateApplied:$('fDate').value,status:$('fStatus').value,link:$('fLink').value.trim(),resumeVersion:$('fResume').value.trim(),coverLetterNotes:$('fCover').value.trim(),notes:$('fNotes').value.trim(),archived:x.archived||false,logs:[...(x.logs||[])]};const log=$('fLog').value.trim();if(log)a.logs.push({date:today(),text:log});if(a.status!==x.status)a.statusUpdatedAt=today();if(await save(a))closeModal()};$('cancelModal').onclick=closeModal}
+function closeModal(){$('modalBack').classList.add('hidden');$('modal').innerHTML=''}
+async function changeStatus(a,newStatus){
+  if(!a || !STATUSES.includes(newStatus) || a.status===newStatus)return;
+  const oldStatus=a.status,oldStatusUpdatedAt=a.statusUpdatedAt;
+  a.status=newStatus;a.statusUpdatedAt=today();render();
+  const ok=await save(a);
+  if(!ok){a.status=oldStatus;a.statusUpdatedAt=oldStatusUpdatedAt;render();setNotice('Status update failed')}
 }
 
-/* ---------- wiring per-view events ---------- */
-function wireViewEvents(){
-  document.querySelectorAll('.card').forEach(card=>{
-    card.addEventListener('click', (e)=>{ if(e.target.closest('.edit-pencil')) return; openDetail(card.dataset.id); });
-    card.addEventListener('dragstart', (e)=>{
-      e.dataTransfer.setData('text/plain', card.dataset.id);
-      e.dataTransfer.effectAllowed='move';
-      setTimeout(()=>card.classList.add('dragging'),0);
-    });
-    card.addEventListener('dragend', ()=> card.classList.remove('dragging'));
-  });
-  document.querySelectorAll('.edit-pencil').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{ e.stopPropagation(); startInlineEdit(btn.dataset.edit); });
-  });
-  document.querySelectorAll('.col-body').forEach(colBody=>{
-    if(colBody.dataset.status==='Archived') return;
-    colBody.addEventListener('dragover', (e)=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; colBody.closest('.col').classList.add('drag-over'); });
-    colBody.addEventListener('dragleave', (e)=>{ if(!colBody.contains(e.relatedTarget)) colBody.closest('.col').classList.remove('drag-over'); });
-    colBody.addEventListener('drop', (e)=>{
-      e.preventDefault();
-      colBody.closest('.col').classList.remove('drag-over');
-      const id = e.dataTransfer.getData('text/plain');
-      const app = apps.find(a=>a.id===id);
-      if(app){ setStatus(app, colBody.dataset.status); saveData(); render(); }
-    });
-  });
-  document.querySelectorAll('.tl-item').forEach(item=>{
-    item.addEventListener('click', ()=> openDetail(item.dataset.id));
-  });
-}
+function editById(id){const a=apps.find(x=>x.id===id);if(a)openModal(a)}
+function exportBackup(){const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),applications:apps},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='job-application-backup.json';a.click();URL.revokeObjectURL(url)}
+async function importBackup(file){try{const data=JSON.parse(await file.text());const list=Array.isArray(data)?data:data.applications;if(!Array.isArray(list))throw new Error('Invalid backup file');for(const item of list){const a={...item,id:undefined,company:String(item.company||''),role:String(item.role||''),dateApplied:item.dateApplied||today(),status:STATUSES.includes(item.status)?item.status:'Applied',logs:Array.isArray(item.logs)?item.logs:[],archived:!!item.archived};if(a.company&&a.role)await save(a)}await loadApps();setNotice('Backup imported')}catch(e){alert('Import failed: '+e.message)}}
 
-function startInlineEdit(id){
-  const app = apps.find(a=>a.id===id);
-  if(!app) return;
-  const card = document.querySelector(`.card[data-id="${id}"]`);
-  if(!card) return;
-  card.innerHTML = `
-    <div class="card-edit-row"><input id="ie-co" value="${esc(app.company)}"></div>
-    <div class="card-edit-row"><input id="ie-role" value="${esc(app.role)}"></div>
-    <div class="card-edit-actions">
-      <button class="link-btn" id="ie-cancel">Cancel</button>
-      <button class="btn-primary" id="ie-save" style="padding:5px 12px;">Save</button>
-    </div>
-  `;
-  card.setAttribute('draggable','false');
-  card.querySelector('#ie-cancel').onclick = (e)=>{ e.stopPropagation(); render(); };
-  card.querySelector('#ie-save').onclick = (e)=>{
-    e.stopPropagation();
-    const co = card.querySelector('#ie-co').value.trim();
-    const role = card.querySelector('#ie-role').value.trim();
-    if(co) app.company = co;
-    if(role) app.role = role;
-    saveData();
-    render();
-  };
-}
 
-/* ---------- tabs / toolbar events ---------- */
-document.getElementById('tabs').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.tab-btn');
-  if(!btn) return;
-  currentView = btn.dataset.view;
-  render();
-});
-document.getElementById('search').addEventListener('input', render);
-document.getElementById('sortSel').addEventListener('change', (e)=>{ sortMode = e.target.value; render(); });
-document.getElementById('followupToggle').addEventListener('click', ()=>{ followUpOnly = !followUpOnly; render(); });
-document.getElementById('archiveToggle').addEventListener('click', ()=>{ showArchived = !showArchived; render(); });
-document.getElementById('addBtn').addEventListener('click', openAddModal);
-document.getElementById('exportBtn').addEventListener('click', exportData);
-document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
-document.getElementById('importFile').addEventListener('change', (e)=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=''; });
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('email').value.trim().toLowerCase();if(!email){msg('Enter your email.');return}if(authMode==='reset'){try{await sendPasswordResetEmail(auth,email);msg('Password reset email sent. Check your inbox.',true)}catch(e){msg(friendlyError(e))}return}const pin=$('pin').value;if(!validPin(pin)){msg('PIN must be exactly 6 digits.');return}$('authSubmit').disabled=true;try{if(authMode==='signup'){await createUserWithEmailAndPassword(auth,email,pin);msg('Account created.',true)}else{await signInWithEmailAndPassword(auth,email,pin)}}catch(e){console.error(e);msg(friendlyError(e))}finally{$('authSubmit').disabled=false}});
+$('toggleAuth').onclick=()=>{if(authMode==='signup'||authMode==='reset')setAuth('signin');else setAuth('signup')};$('forgot').onclick=setReset;$('logout').onclick=()=>signOut(auth);$('add').onclick=()=>openModal();$('search').oninput=render;$('sort').onchange=render;$('export').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};
+$('root').addEventListener('click',e=>{
 
-/* ---------- keyboard shortcuts ---------- */
-document.addEventListener('keydown', (e)=>{
-  const tag = (e.target.tagName||'').toLowerCase();
-  const typing = tag==='input' || tag==='textarea' || tag==='select';
-  const modalOpen = document.getElementById('overlay').classList.contains('open');
-  if(e.key==='Escape' && modalOpen){ closeModal(); return; }
-  if(typing) return;
-  if(e.key==='n' || e.key==='N'){ e.preventDefault(); openAddModal(); }
-  else if(e.key==='/'){ e.preventDefault(); document.getElementById('search').focus(); }
-});
+  const edit=e.target.closest('.edit');
+  const del=e.target.closest('.del');
 
-/* ---------- Add application modal ---------- */
-function openAddModal(){
-  const modal = document.getElementById('modal');
-  modal.innerHTML = `
-    <h2>Log application</h2>
-    <div class="field"><label>Company</label><input id="f-company" placeholder="Acme Corp"></div>
-    <div class="field"><label>Role</label><input id="f-role" placeholder="Product Designer"></div>
-    <div class="row2">
-      <div class="field"><label>Date applied</label><input id="f-date" type="date" value="${todayStr()}"></div>
-      <div class="field"><label>Status</label><select id="f-status">${STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('')}</select></div>
-    </div>
-    <div class="field"><label>Job link (optional)</label><input id="f-link" placeholder="https://..."></div>
-    <div class="row2">
-      <div class="field"><label>Resume version (optional)</label><input id="f-resume" placeholder="Resume_v3_design.pdf"></div>
-      <div class="field"><label>Cover letter notes (optional)</label><input id="f-cover" placeholder="Mentioned referral from Sam"></div>
-    </div>
-    <div class="field"><label>Notes (optional)</label><textarea id="f-notes" placeholder="Referral, salary range, anything to remember"></textarea></div>
-    <div id="formErr" style="color:var(--rust-ink);font-size:12px;margin-bottom:6px;"></div>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="cancelBtn">Cancel</button>
-      <button class="btn-primary" id="saveBtn">Save application</button>
-    </div>
-  `;
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('cancelBtn').onclick = closeModal;
-  document.getElementById('saveBtn').onclick = ()=>{
-    const company = document.getElementById('f-company').value.trim();
-    const role = document.getElementById('f-role').value.trim();
-    if(!company || !role){ document.getElementById('formErr').textContent = "Company and role are required."; return; }
-    const dateApplied = document.getElementById('f-date').value || todayStr();
-    apps.push({
-      id: uid(), company, role, dateApplied,
-      status: document.getElementById('f-status').value,
-      statusUpdatedAt: dateApplied,
-      link: document.getElementById('f-link').value.trim(),
-      resumeVersion: document.getElementById('f-resume').value.trim(),
-      coverLetterNotes: document.getElementById('f-cover').value.trim(),
-      notes: document.getElementById('f-notes').value.trim(),
-      archived: false,
-      logs: []
-    });
-    saveData(); closeModal(); render();
-  };
-}
-function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
-document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeModal(); });
+  if(edit){
+    editById(edit.dataset.id);
+    return;
+  }
 
-/* ---------- Detail / edit modal ---------- */
-function starPickerHTML(id, current){
-  let out = `<div class="star-pick" id="${id}">`;
-  for(let i=1;i<=5;i++) out += `<span data-val="${i}" class="${i<=current?'active':''}">&#9733;</span>`;
-  out += `</div>`;
-  return out;
-}
-function wireStarPicker(elId, getSet){
-  const wrap = document.getElementById(elId);
-  wrap.querySelectorAll('span').forEach(span=>{
-    span.addEventListener('click', ()=>{
-      const val = parseInt(span.dataset.val,10);
-      getSet(val);
-      wrap.querySelectorAll('span').forEach(s=> s.classList.toggle('active', parseInt(s.dataset.val,10)<=val));
-    });
-  });
-}
-function chipRowHTML(idPrefix, selected, cls){
-  return TAG_OPTIONS.map(t=>`<span class="chip ${selected.includes(t)?('sel-'+cls):''}" data-tag="${esc(t)}" data-chipset="${idPrefix}">${esc(t)}</span>`).join('');
-}
-function wireChips(container, selectedArrRef, cls){
-  container.querySelectorAll('.chip').forEach(chip=>{
-    chip.addEventListener('click', ()=>{
-      const tag = chip.dataset.tag;
-      const idx = selectedArrRef.arr.indexOf(tag);
-      if(idx>=0){ selectedArrRef.arr.splice(idx,1); chip.classList.remove('sel-'+cls); }
-      else{ selectedArrRef.arr.push(tag); chip.classList.add('sel-'+cls); }
-    });
-  });
-}
+  if(del){
+    const a=apps.find(x=>x.id===del.dataset.id);
+    if(a)remove(a);
+    return;
+  }
 
-function openDetail(id, showNewLog){
-  const app = apps.find(a=>a.id===id);
-  if(!app) return;
-  const modal = document.getElementById('modal');
+  // Calendar application clicked
+  const calendarApp=e.target.closest('.calendar-app');
 
-  const logsHtml = (app.logs||[]).slice().reverse().map(l=>`
-    <div class="log-entry">
-      <div class="log-top">
-        <span>${esc(l.round||'Interview')} — ${fmtDate(l.date)} ${l.rating?('<span class="stars">'+'&#9733;'.repeat(l.rating)+'</span>'):''}</span>
-        <button class="log-remove" data-logid="${l.id}">Remove</button>
-      </div>
-      <div class="log-body">
-        ${l.wentWell ? `<div><b>Went well:</b> ${esc(l.wentWell)}</div>` : ''}
-        ${l.wentWrong ? `<div><span class="bad">To improve:</span> ${esc(l.wentWrong)}</div>` : ''}
-        ${(l.wellTags&&l.wellTags.length)||(l.wrongTags&&l.wrongTags.length) ? `<div class="log-tags">
-          ${(l.wellTags||[]).map(t=>`<span class="log-tag well">${esc(t)}</span>`).join('')}
-          ${(l.wrongTags||[]).map(t=>`<span class="log-tag wrong">${esc(t)}</span>`).join('')}
-        </div>` : ''}
-      </div>
-    </div>
-  `).join('');
+  if(calendarApp){
+    const a=apps.find(
+      x=>x.id===calendarApp.dataset.calendarId
+    );
 
-  modal.innerHTML = `
-    <div class="detail-head">
-      <h2>${esc(app.company)} ${app.archived?'<span class="badge b-archived" style="margin-left:6px;">Archived</span>':''}</h2>
-      <button class="close-x" id="closeX">&times;</button>
-    </div>
-    <div class="detail-meta">
-      ${esc(app.role)} &middot; applied ${fmtDate(app.dateApplied)}
-    </div>
-    ${researchLinksHTML(app.company)}
-
-    <div class="row2">
-      <div class="field"><label>Status</label><select id="d-status">${STATUSES.map(s=>`<option value="${s}" ${s===app.status?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div class="field"><label>Date applied</label><input id="d-date" type="date" value="${app.dateApplied||''}"></div>
-    </div>
-    <div class="field"><label>Job link</label><input id="d-link" value="${esc(app.link||'')}" placeholder="https://..."></div>
-    <div class="row2">
-      <div class="field"><label>Resume version</label><input id="d-resume" value="${esc(app.resumeVersion||'')}"></div>
-      <div class="field"><label>Cover letter notes</label><input id="d-cover" value="${esc(app.coverLetterNotes||'')}"></div>
-    </div>
-    <div class="field"><label>General notes</label><textarea id="d-notes">${esc(app.notes)}</textarea></div>
-
-    <div class="section-label"><span>Interview log</span><button class="add-log-btn" id="addLogBtn">+ Add entry</button></div>
-    <div id="logsWrap">${logsHtml || '<p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 8px;">No interview rounds logged yet.</p>'}</div>
-    <div id="newLogWrap"></div>
-
-    <div class="modal-actions">
-      <div>
-        ${app.archived
-          ? `<button class="btn-ghost" id="restoreBtn">Restore</button> <button class="btn-danger" id="deleteBtn" style="margin-left:6px;">Delete permanently</button>`
-          : `<button class="btn-ghost" id="archiveBtn">Archive</button> <button class="link-btn" id="deleteBtn" style="margin-left:8px;">delete instead</button>`
-        }
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-ghost" id="printBtn">Print prep sheet</button>
-        <button class="btn-ghost" id="closeBtn">Close</button>
-        <button class="btn-primary" id="updateBtn">Save changes</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('closeX').onclick = closeModal;
-  document.getElementById('closeBtn').onclick = closeModal;
-  document.getElementById('printBtn').onclick = ()=> printPrepSheet(app);
-
-  document.getElementById('updateBtn').onclick = ()=>{
-    setStatus(app, document.getElementById('d-status').value);
-    app.dateApplied = document.getElementById('d-date').value || app.dateApplied;
-    app.link = document.getElementById('d-link').value.trim();
-    app.resumeVersion = document.getElementById('d-resume').value.trim();
-    app.coverLetterNotes = document.getElementById('d-cover').value.trim();
-    app.notes = document.getElementById('d-notes').value.trim();
-    saveData(); render(); closeModal();
-  };
-
-  const delBtn = document.getElementById('deleteBtn');
-  if(delBtn) delBtn.onclick = ()=>{
-    if(confirm(`Permanently delete application to ${app.company}? This can't be undone.`)){
-      apps = apps.filter(a=>a.id!==id);
-      saveData(); render(); closeModal();
+    if(a){
+      openModal(a);
     }
-  };
-  const archBtn = document.getElementById('archiveBtn');
-  if(archBtn) archBtn.onclick = ()=>{
-    app.archived = true;
-    saveData(); render(); closeModal();
-  };
-  const restoreBtn = document.getElementById('restoreBtn');
-  if(restoreBtn) restoreBtn.onclick = ()=>{
-    app.archived = false;
-    saveData(); render(); closeModal();
-  };
 
-  document.getElementById('addLogBtn').onclick = ()=>{ renderNewLogForm(app, id); };
-  modal.querySelectorAll('.log-remove').forEach(btn=>{
-    btn.onclick = ()=>{
-      app.logs = (app.logs||[]).filter(l=>l.id!==btn.dataset.logid);
-      saveData(); openDetail(id);
-    };
-  });
+    return;
+  }
 
-  if(showNewLog) renderNewLogForm(app, id);
-}
+  // Previous month
+  if(e.target.closest('.cal-prev')){
+    calendarDate=new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth()-1,
+      1
+    );
 
-function renderNewLogForm(app, id){
-  const wellSel = {arr:[]};
-  const wrongSel = {arr:[]};
-  let ratingVal = 0;
-  const wrap = document.getElementById('newLogWrap');
-  wrap.innerHTML = `
-    <div class="new-log">
-      <div class="row2">
-        <div class="field"><label>Round</label><select id="log-round">${ROUND_TYPES.map(r=>`<option value="${r}">${r}</option>`).join('')}</select></div>
-        <div class="field"><label>Date</label><input id="log-date" type="date" value="${todayStr()}"></div>
-      </div>
-      <label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-soft);margin-bottom:5px;font-weight:600;">How did it feel</label>
-      ${starPickerHTML('log-stars', 0)}
-      <div class="field"><label>What went well</label><textarea id="log-well" placeholder="Answered the system design question confidently"></textarea></div>
-      <div class="chip-row" id="well-chips">${chipRowHTML('well', [], 'well')}</div>
-      <div class="field"><label>What went wrong / to improve</label><textarea id="log-wrong" placeholder="Rambled on the behavioral question, should've used STAR"></textarea></div>
-      <div class="chip-row" id="wrong-chips">${chipRowHTML('wrong', [], 'wrong')}</div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;">
-        <button class="btn-ghost" id="cancelLogBtn">Cancel</button>
-        <button class="btn-primary" id="saveLogBtn">Save entry</button>
-      </div>
-    </div>
-  `;
-  wireStarPicker('log-stars', (v)=>{ ratingVal = v; });
-  wireChips(document.getElementById('well-chips'), wellSel, 'well');
-  wireChips(document.getElementById('wrong-chips'), wrongSel, 'wrong');
+    renderCalendar();
+    return;
+  }
 
-  document.getElementById('cancelLogBtn').onclick = ()=>{ wrap.innerHTML=''; };
-  document.getElementById('saveLogBtn').onclick = ()=>{
-    const round = document.getElementById('log-round').value;
-    const date = document.getElementById('log-date').value || todayStr();
-    const well = document.getElementById('log-well').value.trim();
-    const wrong = document.getElementById('log-wrong').value.trim();
-    if(!well && !wrong && wellSel.arr.length===0 && wrongSel.arr.length===0){
-      alert('Add a note or tag before saving.');
-      return;
-    }
-    app.logs = app.logs || [];
-    app.logs.push({id:uid(), round, date, wentWell:well, wentWrong:wrong, wellTags:wellSel.arr, wrongTags:wrongSel.arr, rating:ratingVal});
-    saveData();
-    openDetail(id);
-  };
-}
+  // Next month
+  if(e.target.closest('.cal-next')){
+    calendarDate=new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth()+1,
+      1
+    );
 
-loadData();
+    renderCalendar();
+    return;
+  }
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  });
-}
+});
+$('root').addEventListener('dragstart',e=>{const el=e.target.closest('.card');if(!el)return;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',el.dataset.id);el.classList.add('dragging')});
+$('root').addEventListener('dragend',e=>{const el=e.target.closest('.card');if(el)el.classList.remove('dragging');document.querySelectorAll('.col.drag-over').forEach(c=>c.classList.remove('drag-over'))});
+$('root').addEventListener('dragover',e=>{const col=e.target.closest('.col');if(!col)return;e.preventDefault();e.dataTransfer.dropEffect='move';col.classList.add('drag-over')});
+$('root').addEventListener('dragleave',e=>{const col=e.target.closest('.col');if(col&&!col.contains(e.relatedTarget))col.classList.remove('drag-over')});
+$('root').addEventListener('drop',async e=>{const col=e.target.closest('.col');if(!col)return;e.preventDefault();col.classList.remove('drag-over');const id=e.dataTransfer.getData('text/plain');const a=apps.find(x=>x.id===id);if(a)await changeStatus(a,col.dataset.status)});
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{view=t.dataset.view;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));render()});
+$('modalBack').addEventListener('click',e=>{if(e.target===$('modalBack'))closeModal()});
+onAuthStateChanged(auth,u=>{if(u)showApp(u);else showAuth()});
 </script>
-</body>
-</html>
+</body></html>
