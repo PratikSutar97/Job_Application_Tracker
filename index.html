@@ -1,296 +1,450 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Job Application Tracker</title>
-<style>
-:root{--paper:#f3eee1;--card:#fffdf8;--ink:#2a2620;--muted:#6b6455;--line:#c2b694;--red:#7a2e1e;--green:#2e4324;--blue:#22374d}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,Arial,sans-serif;padding:28px 20px 60px}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.wrap{max-width:1180px;margin:auto}.auth-locked{overflow:hidden}
-.auth-gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}.auth-card{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px;box-shadow:0 12px 30px #0001}.auth-card h1{font:600 24px monospace;margin:0 0 6px}.auth-card p{font-size:13px;color:var(--muted);line-height:1.5}.auth-card label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 6px}.auth-card input{width:100%;padding:11px;border:1px solid var(--line);border-radius:4px;background:#fff}.pin{letter-spacing:6px;font:600 20px monospace;text-align:center}.auth-primary,.primary{background:var(--ink);color:var(--paper);border:0;border-radius:4px;padding:11px 16px;font-weight:600}.auth-primary{width:100%;margin-top:16px}.secondary,.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:9px 13px}.auth-link{background:none;border:0;color:var(--blue);text-decoration:underline;font-size:12px;width:100%;padding:10px}.auth-msg{min-height:20px;font-size:12px;line-height:1.4;margin-top:8px}
-header{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:18px}.brand h1{font:600 26px monospace;margin:0 0 4px}.subtitle{font-size:13px;color:var(--muted);margin:0}.userbox{display:flex;align-items:center;gap:8px}.useremail{font-size:11px;color:var(--muted)}.stats{display:flex;gap:20px}.stat{text-align:right}.stat b{display:block;font:600 22px monospace}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}.tab{border:0;background:none;padding:9px 14px;font:600 12px monospace;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--ink);border-bottom-color:var(--ink)}.toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px}.toolbar-left,.toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.search,select{padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink)}.search{min-width:210px}
-.board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}@media(max-width:900px){.board{grid-template-columns:1fr 1fr}}@media(max-width:600px){.board{grid-template-columns:1fr}.stats{width:100%;justify-content:space-between}}
-.col{border:1px solid var(--line);border-radius:6px;padding:10px;background:#fff5}.colhead{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:4px 4px 9px;margin-bottom:9px;font:600 12px monospace;text-transform:uppercase}.cards{min-height:100px}.card{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:12px;margin-bottom:9px}.card:hover{border-color:var(--ink)}.card{cursor:grab}.card.dragging{opacity:.45}.col.drag-over{outline:2px dashed var(--ink);outline-offset:-3px}.cardtop{display:flex;justify-content:space-between;gap:8px}.company{font-weight:600;font-size:14px}.role{font-size:12.5px;color:var(--muted);margin:3px 0 9px}.meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}.badge{font:600 9px monospace;text-transform:uppercase;padding:3px 6px;border-radius:3px}.applied{background:#e7e2d3}.interviewing{background:#dce6ee;color:var(--blue)}.offer{background:#e1ead9;color:var(--green)}.rejected{background:#f1dad3;color:var(--red)}.empty{text-align:center;color:var(--muted);padding:55px 20px}.empty h2{font:600 17px monospace;color:var(--ink)}
-.modalback{position:fixed;inset:0;background:#1e1a1470;z-index:80;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}.modal{background:var(--paper);width:min(600px,100%);border:1px solid var(--ink);border-radius:6px;padding:24px}.modal h2{font:600 18px monospace;margin:0 0 18px}.field{margin-bottom:13px}.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:#fff}.field textarea{min-height:90px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.row{grid-template-columns:1fr}}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px}.danger{background:transparent;border:1px solid var(--red);color:var(--red);border-radius:4px;padding:9px 13px}.notice{font-size:11px;color:var(--muted);min-height:16px;text-align:center;margin-top:6px}
-.listview{display:flex;flex-direction:column;gap:10px}.listrow{background:var(--card);border:1px solid var(--line);padding:13px;border-radius:5px;display:grid;grid-template-columns:1fr auto;gap:10px}.listrow h3{margin:0;font-size:14px}.listrow p{margin:4px 0;color:var(--muted);font-size:12px}.listactions{display:flex;gap:6px;align-items:start}.metricgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.metric{background:var(--card);border:1px solid var(--line);padding:15px;border-radius:5px}.metric b{font:600 26px monospace;display:block}.metric span{font-size:11px;color:var(--muted)}
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+         <link rel="stylesheet" href="styles.css">
+        <title>Job Application Tracker</title>
+        <style>
 
-
-
-.followup-alert{margin-top:7px;padding:5px 7px;border-left:3px solid var(--ink);font:10px monospace;background:var(--card)}
-.followup-alert strong{font-weight:700}
-
-.research-links{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-.research-links a{display:inline-block;border:1px solid var(--line);border-radius:3px;padding:4px 7px;text-decoration:none;font:10px monospace;color:var(--ink);background:var(--card)}
-.research-links a:hover{text-decoration:underline}
-.weekly-chart{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:5px;padding:16px}
-.weekly-chart h3{font:600 14px monospace;margin:0 0 4px}
-.weekly-chart .chart-subtitle{font-size:11px;color:var(--muted);margin-bottom:18px}
-.week-bars{display:grid;grid-template-columns:repeat(8,minmax(45px,1fr));gap:10px;align-items:end;min-height:190px}
-.week-bar-wrap{height:190px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:7px}
-.week-count{font:600 11px monospace;min-height:14px}
-.week-bar-track{height:145px;width:100%;display:flex;align-items:flex-end;justify-content:center}
-.week-bar{width:min(34px,70%);min-height:2px;background:var(--ink);border-radius:3px 3px 0 0}
-.week-label{font:10px monospace;color:var(--muted);text-align:center;white-space:nowrap}
-.weekly-empty{color:var(--muted);font-size:12px;padding:28px 4px;text-align:center}
-@media(max-width:600px){.week-bars{gap:5px}.week-label{font-size:9px}.week-bar{width:22px}}
-/* =========================
-   CALENDAR
-   ========================= */
-
-.calendar-wrap{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:6px;
-  overflow:hidden;
-}
-
-.calendar-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-}
-
-.calendar-title{
-  font:600 18px monospace;
-  margin:0;
-}
-
-.calendar-nav{
-  display:flex;
-  gap:6px;
-}
-
-.calendar-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-}
-
-.calendar-weekday{
-  padding:10px 6px;
-  text-align:center;
-  font:600 10px monospace;
-  text-transform:uppercase;
-  color:var(--muted);
-  border-bottom:1px solid var(--line);
-  background:#faf7ef;
-}
-
-.calendar-day{
-  min-height:125px;
-  padding:7px;
-  border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-  background:var(--card);
-}
-
-.calendar-day:nth-child(7n){
-  border-right:0;
-}
-
-.calendar-day.other-month{
-  background:#f6f1e6;
-  color:#aaa;
-}
-
-.calendar-day.today{
-  box-shadow:inset 0 0 0 2px var(--ink);
-}
-
-.calendar-date{
-  font:600 11px monospace;
-  margin-bottom:6px;
-}
-
-.calendar-apps{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.calendar-app{
-  display:block;
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:3px;
-  padding:5px 6px;
-  text-align:left;
-  background:#fff;
-  cursor:pointer;
-  overflow:hidden;
-}
-
-.calendar-app:hover{
-  border-color:var(--ink);
-}
-
-.calendar-app-company{
-  display:block;
-  font-size:10px;
-  font-weight:600;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.calendar-app-role{
-  display:block;
-  font-size:9px;
-  color:var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  margin-top:2px;
-}
-
-.calendar-app.applied{
-  border-left:4px solid #aaa18c;
-}
-
-.calendar-app.interviewing{
-  border-left:4px solid var(--blue);
-}
-
-.calendar-app.offer{
-  border-left:4px solid var(--green);
-}
-
-.calendar-app.rejected{
-  border-left:4px solid var(--red);
-}
-
-.calendar-more{
-  font:9px monospace;
-  color:var(--muted);
-  padding:2px 4px;
-}
-
-@media(max-width:700px){
-  .calendar-day{
-    min-height:90px;
-    padding:4px;
-  }
-
-  .calendar-app-role{
-    display:none;
-  }
-
-  .calendar-app{
-    padding:4px;
-  }
-
-  .calendar-weekday{
-    font-size:8px;
-  }
-}
-
-@media(max-width:500px){
-  .calendar-day{
-    min-height:70px;
-  }
-
-  .calendar-app-company{
-    font-size:8px;
-  }
-
-  .calendar-date{
-    font-size:9px;
-  }
-}
 </style>
-</head>
-<body class="auth-locked">
-<div id="authGate" class="auth-gate"><div class="auth-card">
-<h1 id="authTitle">Sign in</h1><p id="authSubtitle">Use your email and 6-digit PIN to access your job applications.</p>
-<form id="authForm"><label>Email</label><input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
-<div id="pinBlock"><label>6-digit PIN</label><input id="pin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required placeholder="••••••"></div>
-<div id="newPinBlock" class="hidden"><label>New 6-digit PIN</label><input id="newPin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}"><label>Confirm PIN</label><input id="newPin2" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}"></div>
-<button id="authSubmit" class="auth-primary" type="submit">Sign in</button><button id="forgot" class="auth-link" type="button">Forgot PIN?</button><button id="toggleAuth" class="secondary" type="button" style="width:100%">Create account</button><div id="authMsg" class="auth-msg"></div></form>
-</div></div>
-<div id="app" class="hidden"><div class="wrap">
-<header><div class="brand"><h1>Job Application Tracker</h1><p class="subtitle">Cloud-synced job applications. Your data is private to your account.</p></div><div class="userbox"><span id="userEmail" class="useremail"></span><button id="logout" class="ghost">Log out</button></div><div id="stats" class="stats"></div></header>
-<div class="tabs">
-  <button class="tab active" data-view="board">Board</button>
-  <button class="tab" data-view="list">All applications</button>
-  <button class="tab" data-view="calendar">Calendar</button>
-  <button class="tab" data-view="stats">Stats</button>
+    </head>
+    <body class="auth-locked">
+        <div id="authGate" class="auth-gate">
+
+    <!-- Website Header -->
+    <header class="auth-header">
+        <div class="auth-brand">
+            <div class="auth-logo">JL</div>
+
+            <div>
+                <div class="auth-brand-name">Job Application Tracker</div>
+                <div class="auth-brand-tagline">
+                    Apply. Track. Get Hired.
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-header-badge">
+            🔒 Private & Secure
+        </div>
+    </header>
+
+    <!-- Sign In Area -->
+    <main class="auth-main">
+
+        <div class="auth-card">
+
+            <div class="auth-card-heading">
+                <div class="auth-eyebrow">WELCOME BACK</div>
+
+                <h1 id="authTitle">Sign in</h1>
+
+                <p id="authSubtitle">
+                    Use your email and 6-digit PIN to access your job applications.
+                </p>
+            </div>
+
+            <form id="authForm">
+
+                <label>Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    autocomplete="email"
+                    required
+                    placeholder="you@example.com"
+                >
+
+                <div id="pinBlock">
+                    <label>6-digit PIN</label>
+                    <input
+                        id="pin"
+                        class="pin"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        required
+                        placeholder="••••••"
+                    >
+                </div>
+
+                <div id="newPinBlock" class="hidden">
+
+                    <label>New 6-digit PIN</label>
+                    <input
+                        id="newPin"
+                        class="pin"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                    >
+
+                    <label>Confirm PIN</label>
+                    <input
+                        id="newPin2"
+                        class="pin"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                    >
+
+                </div>
+
+                <button
+                    id="authSubmit"
+                    class="auth-primary"
+                    type="submit"
+                >
+                    Sign in
+                </button>
+
+                <button
+                    id="forgot"
+                    class="auth-link"
+                    type="button"
+                >
+                    Forgot PIN?
+                </button>
+
+                <button
+                    id="toggleAuth"
+                    class="secondary"
+                    type="button"
+                    style="width:100%"
+                >
+                    Create account
+                </button>
+
+                <div id="authMsg" class="auth-msg"></div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="auth-footer">
+        <span>© 2026 Job Application Tracker</span>
+        <span>Your applications stay private to your account.</span>
+    </footer>
+
 </div>
-<div class="toolbar"><div class="toolbar-left"><input id="search" class="search" placeholder="Search company or role..."><select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="company">Company A-Z</option></select><button id="add" class="primary">+ Log application</button></div><div class="toolbar-right"><button id="export" class="ghost">Export backup</button><button id="importBtn" class="ghost">Import backup</button><input id="importFile" type="file" accept="application/json" class="hidden"></div></div>
-<div id="root"></div><div id="notice" class="notice"></div></div></div>
-<div id="modalBack" class="modalback hidden"><div class="modal" id="modal"></div></div>
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
-import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js';
+        <div id="app" class="hidden">
+            <div class="wrap">
+                <header class="site-header">
+    <div class="site-header-inner">
 
-const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
-const STATUSES=['Applied','Interviewing','Offer','Rejected']; let user=null,apps=[],view='board',authMode='signin',resetMode=false,  calendarDate=new Date();
-const $=id=>document.getElementById(id); const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const today=()=>new Date().toISOString().slice(0,10); const validPin=p=>/^\d{6}$/.test(p||'');
-function msg(t,ok=false){$('authMsg').textContent=t||'';$('authMsg').style.color=ok?'var(--green)':'var(--red)'}
-function setAuth(mode){authMode=mode;resetMode=false;$('pinBlock').classList.remove('hidden');$('newPinBlock').classList.add('hidden');$('authTitle').textContent=mode==='signup'?'Create account':'Sign in';$('authSubtitle').textContent=mode==='signup'?'Create an account with your email and a 6-digit PIN.':'Use your email and 6-digit PIN to access your job applications.';$('authSubmit').textContent=mode==='signup'?'Create account':'Sign in';$('forgot').classList.toggle('hidden',mode==='signup');$('toggleAuth').textContent=mode==='signup'?'Back to sign in':'Create account';msg('')}
-function setReset(){resetMode=true;authMode='reset';$('pinBlock').classList.add('hidden');$('newPinBlock').classList.add('hidden');$('authTitle').textContent='Reset PIN';$('authSubtitle').textContent='We will send a secure reset link to your email.';$('authSubmit').textContent='Send reset email';$('forgot').classList.add('hidden');$('toggleAuth').classList.remove('hidden');$('toggleAuth').textContent='Back to sign in';msg('')}
-function showApp(u){user=u;$('authGate').classList.add('hidden');$('app').classList.remove('hidden');document.body.classList.remove('auth-locked');$('userEmail').textContent=u.email||'';loadApps()}
-function showAuth(){user=null;apps=[];$('app').classList.add('hidden');$('authGate').classList.remove('hidden');document.body.classList.add('auth-locked');setAuth('signin')}
-function appCollection(){return collection(db,'users',user.uid,'applications')}
-function normalize(id,d){return {id,company:d.company||'',role:d.role||'',dateApplied:d.dateApplied||today(),status:d.status||'Applied',link:d.link||'',resumeVersion:d.resumeVersion||'',coverLetterNotes:d.coverLetterNotes||'',notes:d.notes||'',archived:!!d.archived,logs:Array.isArray(d.logs)?d.logs:[],statusUpdatedAt:d.statusUpdatedAt||d.dateApplied||today()}}
-async function loadApps(){if(!user)return;try{const snap=await getDocs(query(appCollection(),orderBy('dateApplied','desc')));apps=snap.docs.map(d=>normalize(d.id,d.data()));render()}catch(e){console.error(e);setNotice('Firebase error: '+friendlyError(e))}}
-function friendlyError(e){const code=e?.code||'';const map={'auth/invalid-credential':'Incorrect email or PIN.','auth/email-already-in-use':'An account already exists for this email.','auth/weak-password':'Firebase rejected the PIN. Check your Firebase password policy.','auth/invalid-email':'Enter a valid email address.','auth/too-many-requests':'Too many attempts. Try again later.','auth/user-not-found':'No account exists for this email.','auth/wrong-password':'Incorrect email or PIN.','auth/network-request-failed':'Network request failed. Check your internet connection.','permission-denied':'Firestore denied access. Check Firestore rules and sign-in status.'};return map[code]||e?.message||'Something went wrong.'}
-async function save(a){
-  if(!user)return false;
-  try{
-    const ref=a.id?doc(appCollection(),a.id):doc(appCollection());
-    const data={company:a.company,role:a.role,dateApplied:a.dateApplied,status:a.status,statusUpdatedAt:a.statusUpdatedAt||a.dateApplied,link:a.link||'',resumeVersion:a.resumeVersion||'',coverLetterNotes:a.coverLetterNotes||'',notes:a.notes||'',archived:!!a.archived,logs:a.logs||[],updatedAt:serverTimestamp()};
-    if(!a.id)data.createdAt=serverTimestamp();
-    await setDoc(ref,data,{merge:true});
-    const saved=normalize(ref.id,{...data,createdAt:null,updatedAt:null});
-    const index=apps.findIndex(x=>x.id===ref.id);
-    if(index===-1)apps.push(saved);else apps[index]=saved;
-    render();setNotice('Saved to Firebase');return true;
-  }catch(e){console.error('Firebase save failed:',e);alert(friendlyError(e));return false}
-}
-async function remove(a){if(!confirm('Delete this application?'))return;try{await deleteDoc(doc(appCollection(),a.id));apps=apps.filter(x=>x.id!==a.id);render();setNotice('Deleted')}catch(e){alert(friendlyError(e))}}
-function filtered(){const q=$('search').value.trim().toLowerCase();let x=apps.filter(a=>!a.archived&&(!q||a.company.toLowerCase().includes(q)||a.role.toLowerCase().includes(q)));const s=$('sort').value;if(s==='newest')x.sort((a,b)=>b.dateApplied.localeCompare(a.dateApplied));if(s==='oldest')x.sort((a,b)=>a.dateApplied.localeCompare(b.dateApplied));if(s==='company')x.sort((a,b)=>a.company.localeCompare(b.company));return x}
-function badge(s){return `<span class="badge ${s.toLowerCase()}">${esc(s)}</span>`}
-function renderStats(){const active=apps.filter(a=>a.status==='Applied'||a.status==='Interviewing').length,offers=apps.filter(a=>a.status==='Offer').length,rejected=apps.filter(a=>a.status==='Rejected').length;$('stats').innerHTML=`<div class="stat"><b>${apps.length}</b><span>Total</span></div><div class="stat"><b>${active}</b><span>Active</span></div><div class="stat"><b>${offers}</b><span>Offers</span></div><div class="stat"><b>${rejected}</b><span>Rejected</span></div>`}
+        <div class="brand">
+            <div class="brand-logo">JL</div>
 
-function daysSinceApplied(a){
-  if(!a.dateApplied)return null;
-  const d=new Date(`${a.dateApplied}T00:00:00`);
-  if(Number.isNaN(d.getTime()))return null;
-  const now=new Date();
-  const todayDate=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  return Math.max(0,Math.floor((todayDate-d)/86400000));
-}
+            <div class="brand-text">
+                <h1>Job Application Tracker</h1>
+                <p>Apply. Track. Get Hired.</p>
+            </div>
+        </div>
 
-function needsFollowUp(a){
-  const days=daysSinceApplied(a);
-  return days!==null && days>=7 && a.status==='Applied';
-}
+        <div class="header-right">
+            <div class="privacy-badge">
+                🔒 Private &amp; Secure
+            </div>
 
-function card(a){
-  const q=encodeURIComponent(`${a.company} ${a.role}`.trim());
-  const companyQ=encodeURIComponent(`"${a.company}" official careers`);
-  const linkedin=`https://www.linkedin.com/jobs/search/?keywords=${q}`;
-  const glassdoor=`https://www.glassdoor.co.in/Job/jobs.htm?sc.keyword=${q}`;
-  const companySearch=`https://www.google.com/search?q=${companyQ}`;
-  const days=daysSinceApplied(a);
-  const followUp=needsFollowUp(a);
+            <div class="userbox">
+                <span id="userEmail" class="useremail"></span>
+                <button id="logout" class="ghost">Log out</button>
+            </div>
 
-  return `<div class="card" draggable="true" data-id="${a.id}">
+            <!-- Keep your existing dynamically generated stats -->
+            <div id="stats" class="stats"></div>
+        </div>
+
+    </div>
+</header>
+                <div class="tabs">
+                    <button class="tab active" data-view="board">Board</button
+                    ><button class="tab" data-view="list">All applications</button
+                    ><button class="tab" data-view="stats">Stats</button>
+                </div>
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <input id="search" class="search" placeholder="Search company or role..." /><select id="sort">
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                            <option value="company">Company A-Z</option></select
+                        ><button id="add" class="primary">+ Log New Application</button>
+                    </div>
+                    <div class="toolbar-right"></div>
+                </div>
+                <div id="root"></div>
+                <div id="notice" class="notice"></div>
+            </div>
+        </div>
+        <div id="modalBack" class="modalback hidden"><div class="modal" id="modal"></div></div>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+            import {
+                getAuth,
+                onAuthStateChanged,
+                createUserWithEmailAndPassword,
+                signInWithEmailAndPassword,
+                signOut,
+                sendPasswordResetEmail,
+            } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+            import {
+                getFirestore,
+                collection,
+                doc,
+                getDocs,
+                setDoc,
+                deleteDoc,
+                query,
+                orderBy,
+                serverTimestamp,
+            } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+            import { firebaseConfig } from "./firebase-config.js";
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const STATUSES = ["Applied", "Interviewing", "Offer", "Rejected"];
+            let user = null,
+                apps = [],
+                view = "board",
+                authMode = "signin",
+                resetMode = false;
+            const $ = (id) => document.getElementById(id);
+            const esc = (s) =>
+                String(s ?? "").replace(
+                    /[&<>"']/g,
+                    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
+                );
+            const today = () => new Date().toISOString().slice(0, 10);
+            const validPin = (p) => /^\d{6}$/.test(p || "");
+            function msg(t, ok = false) {
+                $("authMsg").textContent = t || "";
+                $("authMsg").style.color = ok ? "var(--green)" : "var(--red)";
+            }
+            function setAuth(mode) {
+                authMode = mode;
+                resetMode = false;
+
+                // Show normal PIN field
+                $("pinBlock").classList.remove("hidden");
+                $("newPinBlock").classList.add("hidden");
+
+                // PIN is required for sign-in/signup
+                $("pin").required = true;
+
+                $("authTitle").textContent =
+                    mode === "signup" ? "Create account" : "Sign in";
+
+                $("authSubtitle").textContent =
+                    mode === "signup"
+                        ? "Create an account with your email and a 6-digit PIN."
+                        : "Use your email and 6-digit PIN to access your job applications.";
+
+                $("authSubmit").textContent =
+                    mode === "signup" ? "Create account" : "Sign in";
+
+                $("forgot").classList.toggle("hidden", mode === "signup");
+
+                $("toggleAuth").textContent =
+                    mode === "signup" ? "Back to sign in" : "Create account";
+
+                msg("");
+            }
+
+                        function setReset() {
+                resetMode = true;
+                authMode = "reset";
+
+                // Hide PIN fields
+                $("pinBlock").classList.add("hidden");
+                $("newPinBlock").classList.add("hidden");
+
+                // IMPORTANT:
+                // Hidden PIN must NOT be required during reset
+                $("pin").required = false;
+                $("pin").value = "";
+
+                $("authTitle").textContent = "Reset PIN";
+
+                $("authSubtitle").textContent =
+                    "We will send a secure reset link to your email.";
+
+                $("authSubmit").textContent = "Send reset email";
+
+                $("forgot").classList.add("hidden");
+
+                $("toggleAuth").classList.remove("hidden");
+                $("toggleAuth").textContent = "Back to sign in";
+
+                msg("");
+            }
+            function showApp(u) {
+                user = u;
+                $("authGate").classList.add("hidden");
+                $("app").classList.remove("hidden");
+                document.body.classList.remove("auth-locked");
+                $("userEmail").textContent = u.email || "";
+                loadApps();
+            }
+            function showAuth() {
+                user = null;
+                apps = [];
+                $("app").classList.add("hidden");
+                $("authGate").classList.remove("hidden");
+                document.body.classList.add("auth-locked");
+                setAuth("signin");
+            }
+            function appCollection() {
+                return collection(db, "users", user.uid, "applications");
+            }
+            function normalize(id, d) {
+                return {
+                    id,
+                    company: d.company || "",
+                    role: d.role || "",
+                    dateApplied: d.dateApplied || today(),
+                    status: d.status || "Applied",
+                    link: d.link || "",
+                    resumeVersion: d.resumeVersion || "",
+                    coverLetterNotes: d.coverLetterNotes || "",
+                    notes: d.notes || "",
+                    archived: !!d.archived,
+                    logs: Array.isArray(d.logs) ? d.logs : [],
+                    statusUpdatedAt: d.statusUpdatedAt || d.dateApplied || today(),
+                };
+            }
+            async function loadApps() {
+                if (!user) return;
+                try {
+                    const snap = await getDocs(query(appCollection(), orderBy("dateApplied", "desc")));
+                    apps = snap.docs.map((d) => normalize(d.id, d.data()));
+                    render();
+                } catch (e) {
+                    console.error(e);
+                    setNotice("Firebase error: " + friendlyError(e));
+                }
+            }
+            function friendlyError(e) {
+                const code = e?.code || "";
+                const map = {
+                    "auth/invalid-credential": "Incorrect email or PIN.",
+                    "auth/email-already-in-use": "An account already exists for this email.",
+                    "auth/weak-password": "Firebase rejected the PIN. Check your Firebase password policy.",
+                    "auth/invalid-email": "Enter a valid email address.",
+                    "auth/too-many-requests": "Too many attempts. Try again later.",
+                    "auth/user-not-found": "No account exists for this email.",
+                    "auth/wrong-password": "Incorrect email or PIN.",
+                    "auth/network-request-failed": "Network request failed. Check your internet connection.",
+                    "permission-denied": "Firestore denied access. Check Firestore rules and sign-in status.",
+                };
+                return map[code] || e?.message || "Something went wrong.";
+            }
+            async function save(a) {
+                if (!user) return false;
+                try {
+                    const ref = a.id ? doc(appCollection(), a.id) : doc(appCollection());
+                    const data = {
+                        company: a.company,
+                        role: a.role,
+                        dateApplied: a.dateApplied,
+                        status: a.status,
+                        statusUpdatedAt: a.statusUpdatedAt || a.dateApplied,
+                        link: a.link || "",
+                        resumeVersion: a.resumeVersion || "",
+                        coverLetterNotes: a.coverLetterNotes || "",
+                        notes: a.notes || "",
+                        archived: !!a.archived,
+                        logs: a.logs || [],
+                        updatedAt: serverTimestamp(),
+                    };
+                    if (!a.id) data.createdAt = serverTimestamp();
+                    await setDoc(ref, data, { merge: true });
+                    const saved = normalize(ref.id, { ...data, createdAt: null, updatedAt: null });
+                    const index = apps.findIndex((x) => x.id === ref.id);
+                    if (index === -1) apps.push(saved);
+                    else apps[index] = saved;
+                    render();
+                    setNotice("Saved to Firebase");
+                    return true;
+                } catch (e) {
+                    console.error("Firebase save failed:", e);
+                    alert(friendlyError(e));
+                    return false;
+                }
+            }
+            async function remove(a) {
+                if (!confirm("Delete this application?")) return;
+                try {
+                    await deleteDoc(doc(appCollection(), a.id));
+                    apps = apps.filter((x) => x.id !== a.id);
+                    render();
+                    setNotice("Deleted");
+                } catch (e) {
+                    alert(friendlyError(e));
+                }
+            }
+            function filtered() {
+                const q = $("search").value.trim().toLowerCase();
+                let x = apps.filter(
+                    (a) =>
+                        !a.archived && (!q || a.company.toLowerCase().includes(q) || a.role.toLowerCase().includes(q))
+                );
+                const s = $("sort").value;
+                if (s === "newest") x.sort((a, b) => b.dateApplied.localeCompare(a.dateApplied));
+                if (s === "oldest") x.sort((a, b) => a.dateApplied.localeCompare(b.dateApplied));
+                if (s === "company") x.sort((a, b) => a.company.localeCompare(b.company));
+                return x;
+            }
+            // function badge(s){return `<span class="badge ${s.toLowerCase()}">${esc(s)}</span>`}
+            function renderStats() {
+                const active = apps.filter((a) => a.status === "Applied" || a.status === "Interviewing").length,
+                    offers = apps.filter((a) => a.status === "Offer").length,
+                    rejected = apps.filter((a) => a.status === "Rejected").length;
+                $("stats").innerHTML =
+                    `<div class="stat"><b>${apps.length}</b><span>Total</span></div><div class="stat"><b>${active}</b><span>Active</span></div><div class="stat"><b>${offers}</b><span>Offers</span></div><div class="stat"><b>${rejected}</b><span>Rejected</span></div>`;
+            }
+
+            function daysSinceApplied(a) {
+                if (!a.dateApplied) return null;
+                const d = new Date(`${a.dateApplied}T00:00:00`);
+                if (Number.isNaN(d.getTime())) return null;
+                const now = new Date();
+                const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                return Math.max(0, Math.floor((todayDate - d) / 86400000));
+            }
+
+            function needsFollowUp(a) {
+                const days = daysSinceApplied(a);
+                return days !== null && days >= 7 && a.status === "Applied";
+            }
+
+            function card(a) {
+                const q = encodeURIComponent(`${a.company} ${a.role}`.trim());
+                const companyQ = encodeURIComponent(`"${a.company}" official careers`);
+                const linkedin = `https://www.linkedin.com/jobs/search/?keywords=${q}`;
+                const glassdoor = `https://www.glassdoor.co.in/Job/jobs.htm?sc.keyword=${q}`;
+                const companySearch = `https://www.google.com/search?q=${companyQ}`;
+                const days = daysSinceApplied(a);
+                const followUp = needsFollowUp(a);
+
+                return `<div class="card" draggable="true" data-id="${a.id}">
     <div class="cardtop">
       <div><div class="company">${esc(a.company)}</div><div class="role">${esc(a.role)}</div></div>
-      ${badge(a.status)}
+      
     </div>
     <div class="meta">
       <span>${esc(a.dateApplied)}</span>
-      <span>${days===null?'':`${days} day${days===1?'':'s'} since applied`}</span>
-      <span>${a.logs.length} interview${a.logs.length===1?'':'s'}</span>
+      <span>${days === null ? "" : `${days} day${days === 1 ? "" : "s"} since applied`}</span>
+      <span>${a.logs.length} interview${a.logs.length === 1 ? "" : "s"}</span>
     </div>
-    ${followUp?`<div class="followup-alert"><strong>FOLLOW UP</strong> · ${days} days since applied with no response</div>`:''}
+    ${followUp ? `<div class="followup-alert"><strong>FOLLOW UP</strong> · ${days} days since applied with no response</div>` : ""}
     <div class="research-links">
       <a href="${linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       <a href="${glassdoor}" target="_blank" rel="noopener noreferrer">Glassdoor</a>
@@ -301,296 +455,328 @@ function card(a){
       
       <button class="danger del" data-id="${a.id}">Delete</button>
     </div>
-  </div>`
-}
-function renderBoard(){let list=filtered();$('root').innerHTML=`<div class="board">${STATUSES.map(s=>{const items=list.filter(a=>a.status===s);return `<section class="col" data-status="${s}"><div class="colhead"><span>${s}</span><span>${items.length}</span></div><div class="cards">${items.length?items.map(card).join(''):'<div class="empty" style="padding:28px 8px">No applications</div>'}</div></section>`}).join('')}</div>`}
-function renderList(){const list=filtered();$('root').innerHTML=list.length?`<div class="listview">${list.map(a=>`<div class="listrow"><div><h3>${esc(a.company)} — ${esc(a.role)}</h3><p>${esc(a.dateApplied)} · ${badge(a.status)}</p><p>${esc(a.notes||'No notes')}</p></div><div class="listactions"><button class="ghost edit" data-id="${a.id}">Edit</button><button class="danger del" data-id="${a.id}">Delete</button></div></div>`).join('')}</div>`:`<div class="empty"><h2>No applications logged yet</h2><p>Log your first application to start tracking.</p></div>`}
-function formatDateKey(year,month,day){
-  return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-}
+  </div>`;
+            }
+            function renderBoard() {
+                let list = filtered();
+                $("root").innerHTML = `<div class="board">${STATUSES.map((s) => {
+                    const items = list.filter((a) => a.status === s);
+                    return `<section class="col" data-status="${s}"><div class="colhead"><span>${s}</span><span>${items.length}</span></div><div class="cards">${items.length ? items.map(card).join("") : '<div class="empty" style="padding:28px 8px">No applications</div>'}</div></section>`;
+                }).join("")}</div>`;
+            }
+            function renderList() {
+                const list = filtered();
+                $("root").innerHTML = list.length
+                    ? `<div class="listview">${list.map((a) => `<div class="listrow"><div><h3>${esc(a.company)} — ${esc(a.role)}</h3><p>${esc(a.dateApplied)}</p><p>${esc(a.notes || "No notes")}</p></div><div class="listactions"><button class="ghost edit" data-id="${a.id}">Edit</button><button class="danger del" data-id="${a.id}">Delete</button></div></div>`).join("")}</div>`
+                    : `<div class="empty"><h2>No applications logged yet</h2><p>Log your first application to start tracking.</p></div>`;
+            }
+            function renderAnalytics() {
+                const total = apps.length,
+                    offers = apps.filter((a) => a.status === "Offer").length,
+                    interviews = apps.filter((a) => a.status === "Interviewing").length,
+                    rejected = apps.filter((a) => a.status === "Rejected").length,
+                    applied = apps.filter((a) => a.status === "Applied").length;
 
-function calendarMonthName(date){
-  return date.toLocaleDateString('en-IN',{
-    month:'long',
-    year:'numeric'
-  });
-}
+                // Build the last 8 Monday-Sunday weeks, including the current week.
+                const now = new Date();
+                const localToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const mondayOffset = (localToday.getDay() + 6) % 7;
+                const currentMonday = new Date(localToday);
+                currentMonday.setDate(localToday.getDate() - mondayOffset);
 
-function renderCalendar(){
+                const weeks = [];
+                for (let i = 7; i >= 0; i--) {
+                    const start = new Date(currentMonday);
+                    start.setDate(currentMonday.getDate() - i * 7);
+                    const end = new Date(start);
+                    end.setDate(start.getDate() + 6);
 
-  const year=calendarDate.getFullYear();
-  const month=calendarDate.getMonth();
+                    const startKey = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`;
+                    const endKey = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, "0")}-${String(end.getDate()).padStart(2, "0")}`;
 
-  const firstDay=new Date(year,month,1);
-  const lastDay=new Date(year,month+1,0);
+                    const count = apps.filter((a) => a.dateApplied >= startKey && a.dateApplied <= endKey).length;
 
-  // Calendar starts on Sunday.
-  const startOffset=firstDay.getDay();
+                    const label = `${start.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`;
+                    weeks.push({ startKey, endKey, count, label });
+                }
 
-  // Always display complete weeks.
-  const totalCells=Math.ceil((startOffset+lastDay.getDate())/7)*7;
+                const maxCount = Math.max(1, ...weeks.map((w) => w.count));
 
-  const todayKey=today();
-
-  let html=`
-    <div class="calendar-wrap">
-
-      <div class="calendar-header">
-
-        <button class="ghost cal-prev" type="button">
-          ← Previous
-        </button>
-
-        <h2 class="calendar-title">
-          ${esc(calendarMonthName(calendarDate))}
-        </h2>
-
-        <button class="ghost cal-next" type="button">
-          Next →
-        </button>
-
-      </div>
-
-      <div class="calendar-grid">
-
-        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-          .map(day=>`
-            <div class="calendar-weekday">
-              ${day}
-            </div>
-          `).join('')}
-
-  `;
-
-  for(let i=0;i<totalCells;i++){
-
-    const dayNumber=i-startOffset+1;
-
-    const cellDate=new Date(year,month,dayNumber);
-
-    const cellYear=cellDate.getFullYear();
-    const cellMonth=cellDate.getMonth();
-    const cellDay=cellDate.getDate();
-
-    const key=formatDateKey(
-      cellYear,
-      cellMonth,
-      cellDay
-    );
-
-    const isCurrentMonth=cellMonth===month;
-    const isToday=key===todayKey;
-
-    const dayApps=apps.filter(a=>
-      !a.archived &&
-      a.dateApplied===key
-    );
-
-    html+=`
-      <div class="calendar-day
-        ${isCurrentMonth?'':'other-month'}
-        ${isToday?'today':''}"
-        data-date="${key}">
-
-        <div class="calendar-date">
-          ${cellDay}
-        </div>
-
-        <div class="calendar-apps">
-
-          ${dayApps.slice(0,4).map(a=>`
-            <button
-              type="button"
-              class="calendar-app ${a.status.toLowerCase()}"
-              data-calendar-id="${a.id}"
-              title="${esc(a.company)} — ${esc(a.role)}"
-            >
-              <span class="calendar-app-company">
-                ${esc(a.company)}
-              </span>
-
-              <span class="calendar-app-role">
-                ${esc(a.role)}
-              </span>
-            </button>
-          `).join('')}
-
-          ${dayApps.length>4
-            ? `<div class="calendar-more">
-                +${dayApps.length-4} more
-              </div>`
-            : ''
-          }
-
-        </div>
-      </div>
-    `;
-  }
-
-  html+=`
-      </div>
-    </div>
-  `;
-
-  $('root').innerHTML=html;
-}
-function renderAnalytics(){
-  const total=apps.length,
-    offers=apps.filter(a=>a.status==='Offer').length,
-    interviews=apps.filter(a=>a.status==='Interviewing').length,
-    rejected=apps.filter(a=>a.status==='Rejected').length,
-    applied=apps.filter(a=>a.status==='Applied').length;
-
-  // Build the last 8 Monday-Sunday weeks, including the current week.
-  const now=new Date();
-  const localToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const mondayOffset=(localToday.getDay()+6)%7;
-  const currentMonday=new Date(localToday);
-  currentMonday.setDate(localToday.getDate()-mondayOffset);
-
-  const weeks=[];
-  for(let i=7;i>=0;i--){
-    const start=new Date(currentMonday);
-    start.setDate(currentMonday.getDate()-(i*7));
-    const end=new Date(start);
-    end.setDate(start.getDate()+6);
-
-    const startKey=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
-    const endKey=`${end.getFullYear()}-${String(end.getMonth()+1).padStart(2,'0')}-${String(end.getDate()).padStart(2,'0')}`;
-
-    const count=apps.filter(a=>a.dateApplied>=startKey&&a.dateApplied<=endKey).length;
-
-    const label=`${start.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}`;
-    weeks.push({startKey,endKey,count,label});
-  }
-
-  const maxCount=Math.max(1,...weeks.map(w=>w.count));
-
-  const chart=`
+                const chart = `
     <div class="weekly-chart">
       <h3>Applications per week</h3>
       <div class="chart-subtitle">Your application volume over the last 8 weeks</div>
-      ${weeks.some(w=>w.count)
-        ? `<div class="week-bars">${weeks.map(w=>{
-            const height=Math.max(3,Math.round((w.count/maxCount)*145));
-            return `<div class="week-bar-wrap">
+      ${
+          weeks.some((w) => w.count)
+              ? `<div class="week-bars">${weeks
+                    .map((w) => {
+                        const height = Math.max(3, Math.round((w.count / maxCount) * 145));
+                        return `<div class="week-bar-wrap">
               <div class="week-count">${w.count}</div>
-              <div class="week-bar-track"><div class="week-bar" style="height:${height}px" title="${w.count} application${w.count===1?'':'s'}"></div></div>
+              <div class="week-bar-track"><div class="week-bar" style="height:${height}px" title="${w.count} application${w.count === 1 ? "" : "s"}"></div></div>
               <div class="week-label">${esc(w.label)}</div>
             </div>`;
-          }).join('')}</div>`
-        : `<div class="weekly-empty">No applications recorded in the last 8 weeks.</div>`
+                    })
+                    .join("")}</div>`
+              : `<div class="weekly-empty">No applications recorded in the last 8 weeks.</div>`
       }
     </div>`;
 
-  $('root').innerHTML=`
+                $("root").innerHTML = `
     <div class="metricgrid">
       <div class="metric"><b>${total}</b><span>Total applications</span></div>
       <div class="metric"><b>${applied}</b><span>Applied</span></div>
       <div class="metric"><b>${interviews}</b><span>Interviewing</span></div>
       <div class="metric"><b>${offers}</b><span>Offers</span></div>
       <div class="metric"><b>${rejected}</b><span>Rejected</span></div>
-      <div class="metric"><b>${total?Math.round((offers/total)*100):0}%</b><span>Offer rate</span></div>
+      <div class="metric"><b>${total ? Math.round((offers / total) * 100) : 0}%</b><span>Offer rate</span></div>
     </div>
     ${chart}`;
-}
-function render(){
-  renderStats();
+            }
+            function render() {
+                renderStats();
+                if (view === "board") renderBoard();
+                else if (view === "list") renderList();
+                else renderAnalytics();
+            }
+            function setNotice(t) {
+                $("notice").textContent = t;
+                clearTimeout(setNotice.t);
+                setNotice.t = setTimeout(() => {
+                    $("notice").textContent = "";
+                }, 2600);
+            }
+            function openModal(a = null) {
+                const x = a || {
+                    company: "",
+                    role: "",
+                    dateApplied: today(),
+                    status: "Applied",
+                    link: "",
+                    resumeVersion: "",
+                    coverLetterNotes: "",
+                    notes: "",
+                    archived: false,
+                    logs: [],
+                    statusUpdatedAt: today(),
+                };
+                $("modal").innerHTML =
+                    `<h2>${a ? "Edit application" : "Log application"}</h2><form id="appForm"><div class="row"><div class="field"><label>Company</label><input id="fCompany" required value="${esc(x.company)}"></div><div class="field"><label>Role</label><input id="fRole" required value="${esc(x.role)}"></div></div><div class="row"><div class="field"><label>Date applied</label><input id="fDate" type="date" required value="${esc(x.dateApplied)}"></div><div class="field"><label>Status</label><select id="fStatus">${STATUSES.map((s) => `<option ${s === x.status ? "selected" : ""}>${s}</option>`).join("")}</select></div></div><div class="field"><label>Job link</label><input id="fLink" type="url" value="${esc(x.link)}" placeholder="https://..."></div><div class="row"><div class="field"><label>Resume version</label><input id="fResume" value="${esc(x.resumeVersion)}"></div><div class="field"><label>Interview log</label><input id="fLog" placeholder="e.g. HR call — 20 Aug"></div></div><div class="field"><label>Cover letter notes</label><textarea id="fCover">${esc(x.coverLetterNotes)}</textarea></div><div class="field"><label>Notes</label><textarea id="fNotes">${esc(x.notes)}</textarea></div><div class="actions"><button type="button" class="ghost" id="cancelModal">Cancel</button><button class="primary" type="submit">Save application</button></div></form>`;
+                $("modalBack").classList.remove("hidden");
+                $("appForm").onsubmit = async (e) => {
+                    e.preventDefault();
+                    const a = {
+                        ...x,
+                        id: x.id,
+                        company: $("fCompany").value.trim(),
+                        role: $("fRole").value.trim(),
+                        dateApplied: $("fDate").value,
+                        status: $("fStatus").value,
+                        link: $("fLink").value.trim(),
+                        resumeVersion: $("fResume").value.trim(),
+                        coverLetterNotes: $("fCover").value.trim(),
+                        notes: $("fNotes").value.trim(),
+                        archived: x.archived || false,
+                        logs: [...(x.logs || [])],
+                    };
+                    const log = $("fLog").value.trim();
+                    if (log) a.logs.push({ date: today(), text: log });
+                    if (a.status !== x.status) a.statusUpdatedAt = today();
+                    if (await save(a)) closeModal();
+                };
+                $("cancelModal").onclick = closeModal;
+            }
+            function closeModal() {
+                $("modalBack").classList.add("hidden");
+                $("modal").innerHTML = "";
+            }
+            async function changeStatus(a, newStatus) {
+                if (!a || !STATUSES.includes(newStatus) || a.status === newStatus) return;
+                const oldStatus = a.status,
+                    oldStatusUpdatedAt = a.statusUpdatedAt;
+                a.status = newStatus;
+                a.statusUpdatedAt = today();
+                render();
+                const ok = await save(a);
+                if (!ok) {
+                    a.status = oldStatus;
+                    a.statusUpdatedAt = oldStatusUpdatedAt;
+                    render();
+                    setNotice("Status update failed");
+                }
+            }
 
-  if(view==='board'){
-    renderBoard();
-  }
-  else if(view==='list'){
-    renderList();
-  }
-  else if(view==='calendar'){
-    renderCalendar();
-  }
-  else if(view==='stats'){
-    renderAnalytics();
-  }
-}
-function setNotice(t){$('notice').textContent=t;clearTimeout(setNotice.t);setNotice.t=setTimeout(()=>{$('notice').textContent=''},2600)}
-function openModal(a=null){const x=a||{company:'',role:'',dateApplied:today(),status:'Applied',link:'',resumeVersion:'',coverLetterNotes:'',notes:'',archived:false,logs:[],statusUpdatedAt:today()};$('modal').innerHTML=`<h2>${a?'Edit application':'Log application'}</h2><form id="appForm"><div class="row"><div class="field"><label>Company</label><input id="fCompany" required value="${esc(x.company)}"></div><div class="field"><label>Role</label><input id="fRole" required value="${esc(x.role)}"></div></div><div class="row"><div class="field"><label>Date applied</label><input id="fDate" type="date" required value="${esc(x.dateApplied)}"></div><div class="field"><label>Status</label><select id="fStatus">${STATUSES.map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select></div></div><div class="field"><label>Job link</label><input id="fLink" type="url" value="${esc(x.link)}" placeholder="https://..."></div><div class="row"><div class="field"><label>Resume version</label><input id="fResume" value="${esc(x.resumeVersion)}"></div><div class="field"><label>Interview log</label><input id="fLog" placeholder="e.g. HR call — 20 Aug"></div></div><div class="field"><label>Cover letter notes</label><textarea id="fCover">${esc(x.coverLetterNotes)}</textarea></div><div class="field"><label>Notes</label><textarea id="fNotes">${esc(x.notes)}</textarea></div><div class="actions"><button type="button" class="ghost" id="cancelModal">Cancel</button><button class="primary" type="submit">Save application</button></div></form>`;$('modalBack').classList.remove('hidden');$('appForm').onsubmit=async e=>{e.preventDefault();const a={...x,id:x.id,company:$('fCompany').value.trim(),role:$('fRole').value.trim(),dateApplied:$('fDate').value,status:$('fStatus').value,link:$('fLink').value.trim(),resumeVersion:$('fResume').value.trim(),coverLetterNotes:$('fCover').value.trim(),notes:$('fNotes').value.trim(),archived:x.archived||false,logs:[...(x.logs||[])]};const log=$('fLog').value.trim();if(log)a.logs.push({date:today(),text:log});if(a.status!==x.status)a.statusUpdatedAt=today();if(await save(a))closeModal()};$('cancelModal').onclick=closeModal}
-function closeModal(){$('modalBack').classList.add('hidden');$('modal').innerHTML=''}
-async function changeStatus(a,newStatus){
-  if(!a || !STATUSES.includes(newStatus) || a.status===newStatus)return;
-  const oldStatus=a.status,oldStatusUpdatedAt=a.statusUpdatedAt;
-  a.status=newStatus;a.statusUpdatedAt=today();render();
-  const ok=await save(a);
-  if(!ok){a.status=oldStatus;a.statusUpdatedAt=oldStatusUpdatedAt;render();setNotice('Status update failed')}
-}
+            function editById(id) {
+                const a = apps.find((x) => x.id === id);
+                if (a) openModal(a);
+            }
 
-function editById(id){const a=apps.find(x=>x.id===id);if(a)openModal(a)}
-function exportBackup(){const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),applications:apps},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='job-application-backup.json';a.click();URL.revokeObjectURL(url)}
-async function importBackup(file){try{const data=JSON.parse(await file.text());const list=Array.isArray(data)?data:data.applications;if(!Array.isArray(list))throw new Error('Invalid backup file');for(const item of list){const a={...item,id:undefined,company:String(item.company||''),role:String(item.role||''),dateApplied:item.dateApplied||today(),status:STATUSES.includes(item.status)?item.status:'Applied',logs:Array.isArray(item.logs)?item.logs:[],archived:!!item.archived};if(a.company&&a.role)await save(a)}await loadApps();setNotice('Backup imported')}catch(e){alert('Import failed: '+e.message)}}
+            $("authForm").addEventListener("submit", async e => {
+                e.preventDefault();
 
+                const email = $("email").value.trim().toLowerCase();
 
-$('authForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('email').value.trim().toLowerCase();if(!email){msg('Enter your email.');return}if(authMode==='reset'){try{await sendPasswordResetEmail(auth,email);msg('Password reset email sent. Check your inbox.',true)}catch(e){msg(friendlyError(e))}return}const pin=$('pin').value;if(!validPin(pin)){msg('PIN must be exactly 6 digits.');return}$('authSubmit').disabled=true;try{if(authMode==='signup'){await createUserWithEmailAndPassword(auth,email,pin);msg('Account created.',true)}else{await signInWithEmailAndPassword(auth,email,pin)}}catch(e){console.error(e);msg(friendlyError(e))}finally{$('authSubmit').disabled=false}});
-$('toggleAuth').onclick=()=>{if(authMode==='signup'||authMode==='reset')setAuth('signin');else setAuth('signup')};$('forgot').onclick=setReset;$('logout').onclick=()=>signOut(auth);$('add').onclick=()=>openModal();$('search').oninput=render;$('sort').onchange=render;$('export').onclick=exportBackup;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=''};
-$('root').addEventListener('click',e=>{
+                if (!email) {
+                    msg("Enter your email.");
+                    $("email").focus();
+                    return;
+                }
 
-  const edit=e.target.closest('.edit');
-  const del=e.target.closest('.del');
+                // =========================
+                // RESET PIN
+                // =========================
+                if (authMode === "reset") {
+                    $("authSubmit").disabled = true;
+                    $("authSubmit").textContent = "Sending...";
 
-  if(edit){
-    editById(edit.dataset.id);
-    return;
-  }
+                    try {
+                        await sendPasswordResetEmail(auth, email);
 
-  if(del){
-    const a=apps.find(x=>x.id===del.dataset.id);
-    if(a)remove(a);
-    return;
-  }
+                        msg(
+                            "PIN reset email sent. Check your INBOX / SPAM folder.",
+                            true
+                        );
 
-  // Calendar application clicked
-  const calendarApp=e.target.closest('.calendar-app');
+                    } catch (e) {
+                        console.error("Reset PIN error:", e);
+                        msg(friendlyError(e));
 
-  if(calendarApp){
-    const a=apps.find(
-      x=>x.id===calendarApp.dataset.calendarId
-    );
+                    } finally {
+                        $("authSubmit").disabled = false;
+                        $("authSubmit").textContent = "Send reset email";
+                    }
 
-    if(a){
-      openModal(a);
-    }
+                    return;
+                }
 
-    return;
-  }
+                // =========================
+                // SIGN IN / SIGN UP
+                // =========================
+                const pin = $("pin").value;
 
-  // Previous month
-  if(e.target.closest('.cal-prev')){
-    calendarDate=new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth()-1,
-      1
-    );
+                if (!validPin(pin)) {
+                    msg("PIN must be exactly 6 digits.");
+                    $("pin").focus();
+                    return;
+                }
 
-    renderCalendar();
-    return;
-  }
+                $("authSubmit").disabled = true;
 
-  // Next month
-  if(e.target.closest('.cal-next')){
-    calendarDate=new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth()+1,
-      1
-    );
+                try {
 
-    renderCalendar();
-    return;
-  }
+                    if (authMode === "signup") {
 
-});
-$('root').addEventListener('dragstart',e=>{const el=e.target.closest('.card');if(!el)return;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',el.dataset.id);el.classList.add('dragging')});
-$('root').addEventListener('dragend',e=>{const el=e.target.closest('.card');if(el)el.classList.remove('dragging');document.querySelectorAll('.col.drag-over').forEach(c=>c.classList.remove('drag-over'))});
-$('root').addEventListener('dragover',e=>{const col=e.target.closest('.col');if(!col)return;e.preventDefault();e.dataTransfer.dropEffect='move';col.classList.add('drag-over')});
-$('root').addEventListener('dragleave',e=>{const col=e.target.closest('.col');if(col&&!col.contains(e.relatedTarget))col.classList.remove('drag-over')});
-$('root').addEventListener('drop',async e=>{const col=e.target.closest('.col');if(!col)return;e.preventDefault();col.classList.remove('drag-over');const id=e.dataTransfer.getData('text/plain');const a=apps.find(x=>x.id===id);if(a)await changeStatus(a,col.dataset.status)});
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{view=t.dataset.view;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));render()});
-$('modalBack').addEventListener('click',e=>{if(e.target===$('modalBack'))closeModal()});
-onAuthStateChanged(auth,u=>{if(u)showApp(u);else showAuth()});
-</script>
-</body></html>
+                        await createUserWithEmailAndPassword(
+                            auth,
+                            email,
+                            pin
+                        );
+
+                        msg("Account created.", true);
+
+                    } else {
+
+                        await signInWithEmailAndPassword(
+                            auth,
+                            email,
+                            pin
+                        );
+
+                    }
+
+                } catch (e) {
+
+                    console.error("Authentication error:", e);
+                    msg(friendlyError(e));
+
+                } finally {
+
+                    $("authSubmit").disabled = false;
+
+                    $("authSubmit").textContent =
+                        authMode === "signup"
+                            ? "Create account"
+                            : "Sign in";
+                }
+            });
+            $("toggleAuth").onclick = () => {
+                if (authMode === "signup" || authMode === "reset") setAuth("signin");
+                else setAuth("signup");
+            };
+            $("forgot").onclick = setReset;
+            $("logout").onclick = () => signOut(auth);
+            $("add").onclick = () => openModal();
+            $("search").oninput = render;
+            $("root").addEventListener("click", (e) => {
+                const edit = e.target.closest(".edit"),
+                    del = e.target.closest(".del");
+                if (edit) editById(edit.dataset.id);
+
+                if (del) {
+                    const a = apps.find((x) => x.id === del.dataset.id);
+                    if (a) remove(a);
+                }
+            });
+            $("root").addEventListener("dragstart", (e) => {
+                const el = e.target.closest(".card");
+                if (!el) return;
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", el.dataset.id);
+                el.classList.add("dragging");
+            });
+            $("root").addEventListener("dragend", (e) => {
+                const el = e.target.closest(".card");
+                if (el) el.classList.remove("dragging");
+                document.querySelectorAll(".col.drag-over").forEach((c) => c.classList.remove("drag-over"));
+            });
+            $("root").addEventListener("dragover", (e) => {
+                const col = e.target.closest(".col");
+                if (!col) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                col.classList.add("drag-over");
+            });
+            $("root").addEventListener("dragleave", (e) => {
+                const col = e.target.closest(".col");
+                if (col && !col.contains(e.relatedTarget)) col.classList.remove("drag-over");
+            });
+            $("root").addEventListener("drop", async (e) => {
+                const col = e.target.closest(".col");
+                if (!col) return;
+                e.preventDefault();
+                col.classList.remove("drag-over");
+                const id = e.dataTransfer.getData("text/plain");
+                const a = apps.find((x) => x.id === id);
+                if (a) await changeStatus(a, col.dataset.status);
+            });
+            document.querySelectorAll(".tab").forEach(
+                (t) =>
+                    (t.onclick = () => {
+                        view = t.dataset.view;
+                        document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("active", x === t));
+                        render();
+                    })
+            );
+            $("modalBack").addEventListener("click", (e) => {
+                if (e.target === $("modalBack")) closeModal();
+            });
+            onAuthStateChanged(auth, (u) => {
+                if (u) showApp(u);
+                else showAuth();
+            });
+        </script>
+        <footer class="site-footer">
+    <div class="footer-inner">
+        <div>
+            <strong>Job Application Tracker</strong>
+            <span>Apply. Track. Get Hired.</span>
+        </div>
+
+        <div class="footer-right">
+            <span>© 2026 Job Application Tracker</span>
+            <span>Your applications stay private to your account.</span>
+        </div>
+    </div>
+</footer>
+    </body>
+</html>
